@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YUME CAFÉ – Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Zen+Kaku+Gothic+New:wght@300;400;700&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0612;
+    --cream: #f5ede0;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --red: #c0392b;
+    --red-glow: #e74c3c;
+    --purple: #6c3483;
+    --teal: #0e7490;
+    --moon: #f0d080;
+    --stars: #d4c5f9;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--ink);
+    color: var(--cream);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Starfield background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, white 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 25% 40%, #d4c5f9 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 8%, white 0%, transparent 100%),
+      radial-gradient(2px 2px at 60% 22%, #ffd700 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 5%, white 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 88% 30%, #d4c5f9 0%, transparent 100%),
+      radial-gradient(1px 1px at 5% 55%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 70%, white 0%, transparent 100%),
+      radial-gradient(2px 2px at 30% 65%, #d4c5f9 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 80%, white 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 70% 75%, #ffd700 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 60%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 90%, white 0%, transparent 100%),
+      radial-gradient(2px 2px at 45% 92%, #d4c5f9 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 88%, white 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.7;
+  }
+
+  /* Ink wash overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(108,52,131,0.25) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(14,116,144,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 100% 50%, rgba(192,57,43,0.1) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    text-align: center;
+    padding: 60px 20px 40px;
+    position: relative;
+  }
+
+  .header-moon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--moon), #d4a820 60%, #a07010);
+    margin: 0 auto 20px;
+    box-shadow:
+      0 0 40px rgba(240,208,128,0.6),
+      0 0 80px rgba(240,208,128,0.3),
+      0 0 120px rgba(240,208,128,0.15);
+    position: relative;
+    animation: moonPulse 4s ease-in-out infinite;
+  }
+
+  .header-moon::after {
+    content: '🌙';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 52px;
+    filter: drop-shadow(0 0 10px rgba(240,208,128,0.8));
+  }
+
+  @keyframes moonPulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(240,208,128,0.6), 0 0 80px rgba(240,208,128,0.3); }
+    50% { box-shadow: 0 0 60px rgba(240,208,128,0.9), 0 0 120px rgba(240,208,128,0.5); }
+  }
+
+  .cafe-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 40%, #a07010 70%, var(--gold-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 20px rgba(201,168,76,0.5));
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { filter: drop-shadow(0 2px 20px rgba(201,168,76,0.4)); }
+    50% { filter: drop-shadow(0 2px 30px rgba(201,168,76,0.8)); }
+  }
+
+  .cafe-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    color: rgba(245,237,224,0.6);
+    margin-top: 8px;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  .divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+    margin: 30px 0;
+    position: relative;
+  }
+
+  .divider::before {
+    content: '✦';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--ink);
+    padding: 0 12px;
+    color: var(--gold);
+    font-size: 14px;
+  }
+
+  /* ===== CATEGORY TABS ===== */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 40px;
+    padding: 0 10px;
+  }
+
+  .tab {
+    padding: 8px 18px;
+    border: 1px solid rgba(201,168,76,0.4);
+    background: rgba(201,168,76,0.05);
+    color: rgba(245,237,224,0.7);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .tab:hover, .tab.active {
+    background: rgba(201,168,76,0.15);
+    border-color: var(--gold);
+    color: var(--gold-light);
+    box-shadow: 0 0 15px rgba(201,168,76,0.2);
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    margin-bottom: 50px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .section-icon {
+    font-size: 1.6rem;
+    filter: drop-shadow(0 0 8px rgba(201,168,76,0.5));
+  }
+
+  .section-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(201,168,76,0.5), transparent);
+  }
+
+  /* ===== MENU CARDS ===== */
+  .menu-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .menu-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: start;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(245,237,224,0.04) 0%, rgba(201,168,76,0.03) 100%);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .menu-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .menu-item:hover {
+    border-left-color: var(--gold-light);
+    background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(245,237,224,0.04) 100%);
+    transform: translateX(4px);
+    box-shadow: -4px 0 20px rgba(201,168,76,0.15), 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .menu-item:hover::before { opacity: 1; }
+
+  .item-num {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.7rem;
+    color: rgba(201,168,76,0.5);
+    padding-top: 3px;
+    min-width: 24px;
+    text-align: right;
+  }
+
+  .item-body { min-width: 0; }
+
+  .item-name {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+    color: var(--cream);
+    line-height: 1.3;
+    margin-bottom: 5px;
+  }
+
+  .item-desc {
+    font-size: 0.78rem;
+    color: rgba(245,237,224,0.45);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .item-series {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: rgba(201,168,76,0.7);
+    border-radius: 2px;
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+    background: rgba(201,168,76,0.05);
+  }
+
+  .item-price {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--gold);
+    white-space: nowrap;
+    text-align: right;
+    padding-top: 2px;
+  }
+
+  .item-price .currency {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    display: block;
+    text-align: right;
+  }
+
+  /* Special items */
+  .menu-item.premium {
+    border-left-color: var(--moon);
+    background: linear-gradient(135deg, rgba(240,208,128,0.08) 0%, rgba(201,168,76,0.04) 100%);
+  }
+
+  .menu-item.premium .item-price { color: var(--moon); }
+
+  .menu-item.special-combo {
+    border: 1px solid rgba(201,168,76,0.4);
+    border-left: 3px solid var(--red);
+    background: linear-gradient(135deg, rgba(192,57,43,0.08) 0%, rgba(245,237,224,0.03) 100%);
+  }
+
+  .menu-item.special-combo .item-name { color: #f5a89a; }
+  .menu-item.special-combo .item-price { color: #f5a89a; }
+
+  /* Juice grid - 2 col */
+  .juice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .juice-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(14,116,144,0.1) 0%, rgba(245,237,224,0.03) 100%);
+    border: 1px solid rgba(14,116,144,0.25);
+    border-radius: 4px;
+    transition: all 0.3s;
+  }
+
+  .juice-item:hover {
+    background: linear-gradient(135deg, rgba(14,116,144,0.18) 0%, rgba(245,237,224,0.05) 100%);
+    border-color: rgba(14,116,144,0.5);
+    transform: translateY(-2px);
+  }
+
+  .juice-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: rgba(245,237,224,0.85);
+    flex: 1;
+    padding-right: 10px;
+  }
+
+  .juice-price {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.85rem;
+    color: var(--teal);
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  /* Water items */
+  .water-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(245,237,224,0.08);
+    font-size: 0.85rem;
+    color: rgba(245,237,224,0.6);
+    transition: color 0.2s;
+  }
+  .water-row:last-child { border-bottom: none; }
+  .water-row:hover { color: rgba(245,237,224,0.9); }
+  .water-row .w-icon { font-size: 1rem; }
+  .water-row .w-name { flex: 1; }
+  .water-row .w-price { font-family: 'Noto Serif JP', serif; color: var(--gold); font-size: 0.85rem; font-weight: 700; }
+
+  /* Crepe variant */
+  .item-variant {
+    font-size: 0.75rem;
+    color: rgba(245,237,224,0.4);
+    margin-top: 3px;
+  }
+
+  /* ===== COMBO SECTION ===== */
+  .combo-section {
+    margin-bottom: 50px;
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(192,57,43,0.06) 0%, rgba(108,52,131,0.06) 50%, rgba(14,116,144,0.06) 100%);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 4px;
+    position: relative;
+  }
+
+  .combo-section::before {
+    content: '✦ COMBOS OTAKU ✦';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    padding: 0 20px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+  }
+
+  .combo-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid rgba(201,168,76,0.2);
+    font-size: 0.8rem;
+    color: rgba(245,237,224,0.35);
+    letter-spacing: 0.2em;
+    font-family: 'Cinzel Decorative', serif;
+    position: relative;
+  }
+
+  .footer::before {
+    content: '🌙';
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 8px rgba(240,208,128,0.5));
+  }
+
+  /* ===== HIDDEN/SHOW logic ===== */
+  .section[data-cat] { display: block; }
+  .section[data-cat].hidden { display: none; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .menu-item { grid-template-columns: auto 1fr auto; gap: 10px; padding: 12px 14px; }
+    .combo-section { padding: 24px 16px; }
+    .juice-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-moon"></div>
+    <h1 class="cafe-name">YUME CAFÉ</h1>
+    <p class="cafe-subtitle">Anime &nbsp;•&nbsp; Manga &nbsp;•&nbsp; Lounge</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TABS -->
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-filter="all">Tout le menu</button>
+    <button class="tab" data-filter="the">Thés au lait</button>
+    <button class="tab" data-filter="fruit">Fruit Tea</button>
+    <button class="tab" data-filter="jus">Jus frais</button>
+    <button class="tab" data-filter="smoothie">Smoothies</button>
+    <button class="tab" data-filter="gaufre">Gaufres</button>
+    <button class="tab" data-filter="pancake">Pancakes</button>
+    <button class="tab" data-filter="crepe">Crêpes</button>
+    <button class="tab" data-filter="ramen">Ramen</button>
+    <button class="tab" data-filter="autre">Autres</button>
+    <button class="tab" data-filter="combo">Combos</button>
+  </div>
+
+  <!-- THÉ AU LAIT -->
+  <div class="section" data-cat="the">
+    <div class="section-header">
+      <span class="section-icon">🍵</span>
+      <h2 class="section-title">Thés au Lait</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <span class="item-num">01</span>
+        <div class="item-body">
+          <div class="item-name">Mugiwara Classic</div>
+          <div class="item-desc">« La base comme un héros principal »</div>
+          <div class="item-series">One Piece</div>
+        </div>
+        <div class="item-price">2 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">02</span>
+        <div class="item-body">
+          <div class="item-name">Souffle du Soleil</div>
+          <div class="item-desc">« Énergie pure et naturelle »</div>
+          <div class="item-series">Demon Slayer</div>
+        </div>
+        <div class="item-price">1 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">03</span>
+        <div class="item-body">
+          <div class="item-name">Domaine Infini</div>
+          <div class="item-desc">« Doux mais imprévisible »</div>
+          <div class="item-series">Jujutsu Kaisen</div>
+        </div>
+        <div class="item-price">1 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">04</span>
+        <div class="item-body">
+          <div class="item-name">Katon Style 🔥</div>
+          <div class="item-desc">« Sucré avec du caractère »</div>
+          <div class="item-series">Naruto</div>
+        </div>
+        <div class="item-price">1 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item premium">
+        <span class="item-num">05</span>
+        <div class="item-body">
+          <div class="item-name">Titan Royale</div>
+          <div class="item-desc">« Couleur mystique venue d'un autre monde »</div>
+          <div class="item-series">Attack on Titan</div>
+        </div>
+        <div class="item-price">3 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item premium">
+        <span class="item-num">06</span>
+        <div class="item-body">
+          <div class="item-name">Super Saiyen Spicy</div>
+          <div class="item-desc">« Puissant, épicé, inoubliable »</div>
+          <div class="item-series">Dragon Ball Z</div>
+        </div>
+        <div class="item-price">3 000<span class="currency">FCFA</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRUIT TEA -->
+  <div class="section" data-cat="fruit">
+    <div class="section-header">
+      <span class="section-icon">🍑</span>
+      <h2 class="section-title">Fruit Tea</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <span class="item-num">07</span>
+        <div class="item-body">
+          <div class="item-name">Sunny-Go Tropical</div>
+          <div class="item-desc">« Le goût de l'aventure sur le navire de l'équipage »</div>
+          <div class="item-series">One Piece</div>
+        </div>
+        <div class="item-price">2 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">08</span>
+        <div class="item-body">
+          <div class="item-name">Zangetsu Mango</div>
+          <div class="item-desc">« Frappant et tranchant comme un bankaï »</div>
+          <div class="item-series">Bleach</div>
+        </div>
+        <div class="item-price">2 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">09</span>
+        <div class="item-body">
+          <div class="item-name">Raikiri Lemon</div>
+          <div class="item-desc">« Traverse la soif à la vitesse de l'éclair »</div>
+          <div class="item-series">Naruto</div>
+        </div>
+        <div class="item-price">1 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">10</span>
+        <div class="item-body">
+          <div class="item-name">Perfect Ananas</div>
+          <div class="item-desc">« Un équilibre parfait, digne de Cell »</div>
+          <div class="item-series">Dragon Ball Z</div>
+        </div>
+        <div class="item-price">1 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">11</span>
+        <div class="item-body">
+          <div class="item-name">Gomu Gomu Grenadine</div>
+          <div class="item-desc">« Élastique et rafraîchissant »</div>
+          <div class="item-series">One Piece</div>
+        </div>
+        <div class="item-price">1 000<span class="currency">FCFA</span></div>
+      </div>
+    </div>
+    <!-- PREMIUM -->
+    <div style="margin-top:20px">
+      <div class="menu-item premium">
+        <span class="item-num">12</span>
+        <div class="item-body">
+          <div class="item-name">✨ Sage Mode Matcha Latte</div>
+          <div class="item-desc">« La sagesse du matcha, la puissance du chakra naturel »</div>
+          <div class="item-series">Naruto – SPÉCIAL PREMIUM</div>
+        </div>
+        <div class="item-price">4 500<span class="currency">FCFA</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JUS FRAIS -->
+  <div class="section" data-cat="jus">
+    <div class="section-header">
+      <span class="section-icon">🇲🇱</span>
+      <h2 class="section-title">Jus Frais – Les 7 Guerriers</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="juice-grid">
+      <div class="juice-item"><span class="juice-name">Jus Mangekyō Mangue</span><span class="juice-price">500 FCFA</span></div>
+      <div class="juice-item"><span class="juice-name">Jus Ananas no Mi</span><span class="juice-price">500 FCFA</span></div>
+      <div class="juice-item"><span class="juice-name">Jus Citron Menthe Nen</span><span class="juice-price">500 FCFA</span></div>
+      <div class="juice-item"><span class="juice-name">Jus Gingembre Bankaï</span><span class="juice-price">500 FCFA</span></div>
+      <div class="juice-item"><span class="juice-name">Jus Bissap Susanoo</span><span class="juice-price">500 FCFA</span></div>
+      <div class="juice-item"><span class="juice-name">Jus Tamarin Sharingan</span><span class="juice-price">500 FCFA</span></div>
+      <div class="juice-item"><span class="juice-name">Jus Zaban Hakai</span><span class="juice-price">500 FCFA</span></div>
+    </div>
+  </div>
+
+  <!-- SMOOTHIES -->
+  <div class="section" data-cat="smoothie">
+    <div class="section-header">
+      <span class="section-icon">🧋</span>
+      <h2 class="section-title">Smoothies</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <span class="item-num">20</span>
+        <div class="item-body">
+          <div class="item-name">Might Guy Mango Smoothie</div>
+          <div class="item-desc">« Le carburant du printemps de la jeunesse ! »</div>
+          <div class="item-series">Naruto</div>
+        </div>
+        <div class="item-price">2 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item premium">
+        <span class="item-num">21</span>
+        <div class="item-body">
+          <div class="item-name">Spirit Bomb Tropical Mix</div>
+          <div class="item-desc">« Concentre toute l'énergie des fruits dans un seul verre »</div>
+          <div class="item-series">Dragon Ball Z</div>
+        </div>
+        <div class="item-price">3 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">22</span>
+        <div class="item-body">
+          <div class="item-name">Banana Milk Smoothie de Yusuke</div>
+          <div class="item-desc">« Le mix préféré du détective du monde des esprits »</div>
+          <div class="item-series">Yu Yu Hakusho</div>
+        </div>
+        <div class="item-price">2 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">23</span>
+        <div class="item-body">
+          <div class="item-name">Fraise Dream Sailor Moon</div>
+          <div class="item-desc">« Par la lune, sucre-toi de bonheur ! »</div>
+          <div class="item-series">Sailor Moon</div>
+        </div>
+        <div class="item-price">2 000<span class="currency">FCFA</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAUFRES -->
+  <div class="section" data-cat="gaufre">
+    <div class="section-header">
+      <span class="section-icon">🧇</span>
+      <h2 class="section-title">Gaufres</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item"><span class="item-num">24</span><div class="item-body"><div class="item-name">Gaufre Classique Konoha</div><div class="item-series">Naruto</div></div><div class="item-price">1 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">25</span><div class="item-body"><div class="item-name">Gaufre Chocolat Akatsuki</div><div class="item-series">Naruto</div></div><div class="item-price">2 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">26</span><div class="item-body"><div class="item-name">Gaufre Banane Choco Gear 2</div><div class="item-series">One Piece</div></div><div class="item-price">2 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">27</span><div class="item-body"><div class="item-name">Gaufre Mangue Vongola</div><div class="item-series">Reborn!</div></div><div class="item-price">2 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item premium"><span class="item-num">28</span><div class="item-body"><div class="item-name">Gaufre Oreo no Mi</div><div class="item-desc">« Le fruit du démon des gourmands »</div></div><div class="item-price">3 000<span class="currency">FCFA</span></div></div>
+    </div>
+  </div>
+
+  <!-- PANCAKES -->
+  <div class="section" data-cat="pancake">
+    <div class="section-header">
+      <span class="section-icon">🥞</span>
+      <h2 class="section-title">Pancakes</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item"><span class="item-num">29</span><div class="item-body"><div class="item-name">Pancake Nature Happy</div><div class="item-desc">« Le sourire de Happy, simple et réconfortant »</div><div class="item-series">Fairy Tail</div></div><div class="item-price">1 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">30</span><div class="item-body"><div class="item-name">Pancake Chocolat Mafia</div><div class="item-desc">« Des pancakes sombres comme la Varia »</div><div class="item-series">Reborn!</div></div><div class="item-price">1 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">31</span><div class="item-body"><div class="item-name">Pancake Banane Miel de Chopper</div><div class="item-desc">« Le remède sucré du docteur de l'équipage »</div><div class="item-series">One Piece</div></div><div class="item-price">1 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">32</span><div class="item-body"><div class="item-name">Pancake Fruits Mix Straw Hat</div><div class="item-series">One Piece</div></div><div class="item-price">1 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">33</span><div class="item-body"><div class="item-name">Pancake Peanut Butter Titans</div><div class="item-desc">« Pâte solide comme un titan »</div><div class="item-series">Attack on Titan</div></div><div class="item-price">1 500<span class="currency">FCFA</span></div></div>
+    </div>
+  </div>
+
+  <!-- CRÊPES -->
+  <div class="section" data-cat="crepe">
+    <div class="section-header">
+      <span class="section-icon">🥞</span>
+      <h2 class="section-title">Crêpes</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <span class="item-num">34</span>
+        <div class="item-body">
+          <div class="item-name">Crêpe Nutella Shinigami</div>
+          <div class="item-desc">« Le sceau chocolaté du dieu de la mort »</div>
+          <div class="item-series">Death Note / Bleach</div>
+          <div class="item-variant">Petite – 1 500 FCFA &nbsp;|&nbsp; Grande – 2 000 FCFA</div>
+        </div>
+        <div class="item-price">1 500+<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item"><span class="item-num">35</span><div class="item-body"><div class="item-name">Crêpe Banane Chocolat Fullmetal</div><div class="item-desc">« L'alchimie parfaite sucre-fruit »</div><div class="item-series">Fullmetal Alchemist</div></div><div class="item-price">2 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">36</span><div class="item-body"><div class="item-name">Crêpe Caramel Beurre Alabasta</div><div class="item-desc">« Aussi chaud que le désert d'Arabasta »</div><div class="item-series">One Piece</div></div><div class="item-price">2 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">37</span><div class="item-body"><div class="item-name">Crêpe Mangue Mélodieuse</div><div class="item-desc">« La douceur d'une mélodie »</div><div class="item-series">Shigatsu wa Kimi no Uso</div></div><div class="item-price">2 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">38</span><div class="item-body"><div class="item-name">Crêpe Fraise Love ❤️</div><div class="item-desc">« Déclare ta flamme en dessert »</div><div class="item-series">Kaguya-sama</div></div><div class="item-price">2 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">39</span><div class="item-body"><div class="item-name">Crêpe Oreo Dream Eater</div><div class="item-desc">« Le croque-mitaine des gourmands »</div></div><div class="item-price">2 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">40</span><div class="item-body"><div class="item-name">Crêpe Poulet Fromage Hunter</div><div class="item-desc">« Pour les pro du Nen »</div><div class="item-series">Hunter x Hunter</div></div><div class="item-price">3 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">41</span><div class="item-body"><div class="item-name">Crêpe Œuf Fromage Dragon Slayer</div><div class="item-desc">« Réservée aux mages »</div><div class="item-series">Fairy Tail</div></div><div class="item-price">3 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item premium"><span class="item-num">42</span><div class="item-body"><div class="item-name">Crêpe Thon Fromage Levi's Choice</div><div class="item-desc">« La protéine du plus fort soldat de l'humanité »</div><div class="item-series">Attack on Titan</div></div><div class="item-price">4 000<span class="currency">FCFA</span></div></div>
+    </div>
+  </div>
+
+  <!-- RAMEN -->
+  <div class="section" data-cat="ramen">
+    <div class="section-header">
+      <span class="section-icon">🍜</span>
+      <h2 class="section-title">Ramen Coréens – Hallyu Wave</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <span class="item-num">43</span>
+        <div class="item-body">
+          <div class="item-name">Ramen Squid Game</div>
+          <div class="item-desc">« Le piquant qui élimine la faim. Tu joues ? »</div>
+          <div class="item-series">Squid Game &nbsp;|&nbsp; +Fromage : 500 FCFA</div>
+        </div>
+        <div class="item-price">1 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">44</span>
+        <div class="item-body">
+          <div class="item-name">Ramen Solo Flavoring</div>
+          <div class="item-desc">« Ton niveau de saveur monte en flèche »</div>
+          <div class="item-series">Solo Leveling</div>
+        </div>
+        <div class="item-price">2 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">45</span>
+        <div class="item-body">
+          <div class="item-name">Ramen Tower of Ramyun</div>
+          <div class="item-desc">« Monte les étages de la saveur »</div>
+          <div class="item-series">Tower of God</div>
+        </div>
+        <div class="item-price">2 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item">
+        <span class="item-num">46</span>
+        <div class="item-body">
+          <div class="item-name">Ramen Black Mamba</div>
+          <div class="item-desc">« Un coup de fouet électrisant, comme aespa »</div>
+          <div class="item-series">K-Pop</div>
+        </div>
+        <div class="item-price">2 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item premium">
+        <span class="item-num">47</span>
+        <div class="item-body">
+          <div class="item-name">Ramen Dynamite</div>
+          <div class="item-desc">« Explosion de saveurs façon BTS. Light it up! »</div>
+          <div class="item-series">BTS</div>
+        </div>
+        <div class="item-price">3 000<span class="currency">FCFA</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTRES -->
+  <div class="section" data-cat="autre">
+    <div class="section-header">
+      <span class="section-icon">☕</span>
+      <h2 class="section-title">Autres</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item"><span class="item-num">48</span><div class="item-body"><div class="item-name">Cappuccino de l'Aube</div></div><div class="item-price">1 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">49</span><div class="item-body"><div class="item-name">Café du Hokage</div><div class="item-series">Naruto</div></div><div class="item-price">1 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">50</span><div class="item-body"><div class="item-name">Chocolat Chaud Hotaru</div></div><div class="item-price">1 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">51</span><div class="item-body"><div class="item-name">Limonade Maison Bubble Breath</div></div><div class="item-price">1 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">52</span><div class="item-body"><div class="item-name">Energy Drink Turbo Granny</div></div><div class="item-price">1 500<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">53</span><div class="item-body"><div class="item-name">Salade de Fruits de la Paix</div></div><div class="item-price">2 000<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">54</span><div class="item-body"><div class="item-name">Croissant de Kiki</div><div class="item-series">Kiki's Delivery Service</div></div><div class="item-price">600<span class="currency">FCFA</span></div></div>
+      <div class="menu-item"><span class="item-num">55</span><div class="item-body"><div class="item-name">Œuf au Plat Dragon de Komodo</div></div><div class="item-price">1 000<span class="currency">FCFA</span></div></div>
+    </div>
+
+    <!-- WATER -->
+    <div style="margin-top:24px; border: 1px solid rgba(201,168,76,0.15); border-radius:4px; overflow:hidden;">
+      <div class="water-row"><span class="w-icon">💧</span><span class="w-name">Eau fraîche (verre)</span><span class="w-price">150 FCFA</span></div>
+      <div class="water-row"><span class="w-icon">💧</span><span class="w-name">Eau minérale (petit)</span><span class="w-price">250 FCFA</span></div>
+      <div class="water-row"><span class="w-icon">💧</span><span class="w-name">Eau minérale (grand)</span><span class="w-price">1 000 FCFA</span></div>
+    </div>
+  </div>
+
+  <!-- COMBOS -->
+  <div class="section combo-section" data-cat="combo">
+    <div class="combo-grid">
+      <div class="menu-item special-combo">
+        <span class="item-num">🍥</span>
+        <div class="item-body">
+          <div class="item-name">Genin Starter</div>
+          <div class="item-desc">Ramen Squid Game + Mugiwara Classic</div>
+        </div>
+        <div class="item-price">3 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item special-combo">
+        <span class="item-num">🔥</span>
+        <div class="item-body">
+          <div class="item-name">Kage Bunshin Boost</div>
+          <div class="item-desc">Ramen Black Mamba + Katon Style</div>
+        </div>
+        <div class="item-price">4 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item special-combo">
+        <span class="item-num">⚡</span>
+        <div class="item-body">
+          <div class="item-name">Transcendance SSJ</div>
+          <div class="item-desc">Super Saiyen Spicy + Gaufre Oreo no Mi</div>
+        </div>
+        <div class="item-price">5 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item special-combo">
+        <span class="item-num">🍃</span>
+        <div class="item-body">
+          <div class="item-name">Maîtrise du Souffle</div>
+          <div class="item-desc">Sage Mode Matcha Latte + Crêpe Mangue Mélodieuse</div>
+        </div>
+        <div class="item-price">5 500<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item special-combo">
+        <span class="item-num">🌊</span>
+        <div class="item-body">
+          <div class="item-name">Hallyu Wave Combo</div>
+          <div class="item-desc">Ramen Solo Flavoring + Souffle du Soleil</div>
+        </div>
+        <div class="item-price">3 000<span class="currency">FCFA</span></div>
+      </div>
+      <div class="menu-item special-combo">
+        <span class="item-num">🀄</span>
+        <div class="item-body">
+          <div class="item-name">Quatuor Stellaire (à partager)</div>
+          <div class="item-desc">Spirit Bomb Smoothie ×2 + Gaufre Akatsuki + Pancake Titans</div>
+        </div>
+        <div class="item-price">7 500<span class="currency">FCFA</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    YUME CAFÉ – Le goût de l'aventure otaku
+  </div>
+
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('.section[data-cat]');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const filter = tab.dataset.filter;
+      sections.forEach(sec => {
+        if (filter === 'all' || sec.dataset.cat === filter) {
+          sec.classList.remove('hidden');
+          sec.style.animationName = 'none';
+          requestAnimationFrame(() => { sec.style.animationName = 'fadeUp'; });
+        } else {
+          sec.classList.add('hidden');
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
