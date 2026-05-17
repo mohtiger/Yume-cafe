@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Yume Café – Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0c14;--surface:#1a1626;--surface2:#221d33;
+  --text:#f0e6d3;--muted:#7a6e8a;--ink:#0e0c14;
+  --gold:#e8b84b;--pink:#ff4fa3;--purple:#9b59f7;
+  --teal:#26d0ce;--blue:#4fc3f7;--red:#ff3030;
+  --green:#25d366;--border:rgba(232,184,75,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans-serif;font-size:14px;min-height:100vh;}
+
+/* ── PIN SCREEN ── */
+.pin-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;}
+.pin-screen.hidden{display:none;}
+.pin-logo{font-family:'Bangers',cursive;font-size:2.5rem;letter-spacing:0.2em;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.pin-sub{font-size:0.72rem;color:var(--muted);letter-spacing:0.1em;}
+.pin-dots{display:flex;gap:12px;margin:8px 0;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.2s;}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:260px;width:100%;}
+.pin-key{height:56px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:1.2rem;font-weight:800;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.pin-key:hover{border-color:var(--gold);background:rgba(232,184,75,0.1);}
+.pin-key:active{transform:scale(0.95);}
+.pin-key.del{color:var(--red);}
+.pin-key.empty{background:transparent;border:none;cursor:default;}
+.pin-error{color:var(--red);font-size:0.72rem;height:20px;text-align:center;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--surface);border-bottom:2px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.topbar-title{flex:1;font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:0.1em;color:var(--gold);}
+.logout-btn{padding:6px 12px;border-radius:20px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:0.68rem;font-weight:800;cursor:pointer;}
+.save-status{font-size:0.65rem;color:var(--teal);display:none;}
+.save-status.show{display:block;}
+
+/* ── TABS ── */
+.tabs{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);background:var(--surface);scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:12px 16px;border:none;background:transparent;color:var(--muted);font-size:0.72rem;font-weight:800;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* ── TAB PANELS ── */
+.tab-panel{display:none;padding:16px;}
+.tab-panel.active{display:block;}
+
+/* ── SECTION TITLE ── */
+.section-title{font-family:'Bangers',cursive;font-size:1.1rem;letter-spacing:0.1em;color:var(--gold);margin-bottom:12px;}
+.section-sub{font-size:0.68rem;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+
+/* ── FORM ELEMENTS ── */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.label{font-size:0.65rem;font-weight:800;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;}
+.input,.select,.textarea{width:100%;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'M PLUS Rounded 1c',sans-serif;font-size:0.82rem;outline:none;transition:border-color 0.2s;}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--gold);}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%237a6e8a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.select option{background:var(--surface2);color:var(--text);}
+.textarea{resize:vertical;min-height:70px;line-height:1.5;}
+.input::placeholder,.textarea::placeholder{color:var(--muted);}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 18px;border-radius:10px;border:none;cursor:pointer;font-family:'M PLUS Rounded 1c',sans-serif;font-weight:800;font-size:0.8rem;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--pink));color:var(--ink);}
+.btn-success{background:linear-gradient(135deg,var(--teal),var(--blue));color:var(--ink);}
+.btn-danger{background:rgba(255,48,48,0.15);border:1px solid var(--red);color:var(--red);}
+.btn-sm{padding:6px 12px;font-size:0.7rem;border-radius:8px;}
+.btn:hover{transform:scale(1.03);}
+.btn:active{transform:scale(0.97);}
+
+/* ── CARDS LISTE ── */
+.item-list{display:flex;flex-direction:column;gap:8px;}
+.item-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:flex-start;gap:10px;}
+.item-card-content{flex:1;}
+.item-card-title{font-size:0.8rem;font-weight:800;color:var(--text);margin-bottom:4px;}
+.item-card-meta{font-size:0.65rem;color:var(--muted);line-height:1.4;}
+.item-card-actions{display:flex;gap:6px;flex-shrink:0;}
+.item-emoji{font-size:1.5rem;flex-shrink:0;}
+
+/* ── STOCK TOGGLE ── */
+.stock-item{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
+.stock-name{font-size:0.78rem;font-weight:700;}
+.stock-price{font-size:0.65rem;color:var(--muted);}
+.toggle-wrap{display:flex;align-items:center;gap:8px;}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--red);border-radius:24px;cursor:pointer;transition:0.3s;}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;}
+.toggle input:checked + .toggle-slider{background:var(--green);}
+.toggle input:checked + .toggle-slider::before{transform:translateX(20px);}
+.toggle-label{font-size:0.65rem;font-weight:800;min-width:40px;}
+
+/* ── HORAIRES GRID ── */
+.horaires-grid{display:flex;flex-direction:column;gap:8px;}
+.horaire-row{display:grid;grid-template-columns:80px 1fr 1fr;gap:8px;align-items:center;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;}
+.horaire-day{font-size:0.75rem;font-weight:800;color:var(--gold);}
+.horaire-input{padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem;outline:none;width:100%;text-align:center;}
+.horaire-input:focus{border-color:var(--gold);}
+
+/* ── PHOTO URL INPUT ── */
+.photo-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
+.photo-name{font-size:0.7rem;font-weight:800;color:var(--text);margin-bottom:3px;}
+.photo-input{width:100%;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.68rem;outline:none;}
+.photo-input:focus{border-color:var(--gold);}
+.photo-preview{width:40px;height:40px;border-radius:6px;object-fit:cover;border:1px solid var(--border);background:var(--bg);}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.stat-val{font-family:'Bangers',cursive;font-size:2rem;color:var(--gold);}
+.stat-label{font-size:0.62rem;color:var(--muted);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:20px;right:16px;z-index:500;}
+.admin-toast{background:var(--surface);border:1px solid var(--teal);border-radius:10px;padding:10px 14px;font-size:0.75rem;color:var(--text);max-width:240px;transform:translateY(80px);opacity:0;transition:all 0.3s;}
+.admin-toast.show{transform:translateY(0);opacity:1;}
+
+/* ── SEASON ── */
+.season-card{background:linear-gradient(135deg,rgba(155,89,247,0.15),rgba(255,79,163,0.1));border:1px solid rgba(155,89,247,0.3);border-radius:12px;padding:16px;margin-bottom:16px;}
+.season-name{font-family:'Bangers',cursive;font-size:1.3rem;letter-spacing:0.1em;color:var(--purple);margin-bottom:6px;}
+.season-info{font-size:0.68rem;color:var(--muted);line-height:1.6;}
+.reset-warning{background:rgba(255,48,48,0.08);border:1px solid rgba(255,48,48,0.3);border-radius:8px;padding:10px 12px;font-size:0.68rem;color:var(--muted);margin-top:10px;line-height:1.5;}
+
+/* ── USERS ── */
+.user-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;}
+.user-header{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.user-emoji{font-size:1.5rem;}
+.user-name{font-weight:800;font-size:0.85rem;}
+.user-rank{font-size:0.65rem;color:var(--gold);}
+.user-stats{display:flex;gap:12px;font-size:0.65rem;color:var(--muted);}
+.user-stat span{color:var(--text);font-weight:800;}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:16px 0;}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:32px 16px;color:var(--muted);font-size:0.75rem;line-height:1.6;border:1px dashed var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+
+<!-- ── PIN SCREEN ── -->
+<div class="pin-screen" id="pinScreen">
+  <div class="pin-logo">YUME ADMIN</div>
+  <div class="pin-sub">PANNEAU D'ADMINISTRATION · ACCÈS RESTREINT</div>
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="pin-error" id="pinError"></div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <div class="pin-key empty"></div>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="mainApp" style="display:none;">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">🎌 YUME ADMIN</div>
+    <span class="save-status" id="saveStatus">✅ Sauvegardé</span>
+    <button class="logout-btn" onclick="logout()">Quitter</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
+    <button class="tab-btn" onclick="switchTab('stock',this)">🔴 Stock</button>
+    <button class="tab-btn" onclick="switchTab('photos',this)">📸 Photos</button>
+    <button class="tab-btn" onclick="switchTab('news',this)">📰 Coo News</button>
+    <button class="tab-btn" onclick="switchTab('gallery',this)">🖼️ Galerie</button>
+    <button class="tab-btn" onclick="switchTab('horaires',this)">⏰ Horaires</button>
+    <button class="tab-btn" onclick="switchTab('infos',this)">⚙️ Infos</button>
+    <button class="tab-btn" onclick="switchTab('users',this)">👥 Utilisateurs</button>
+    <button class="tab-btn" onclick="switchTab('saisons',this)">🌙 Saisons</button>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="tab-panel active" id="tab-dashboard">
+    <div class="section-title">Vue d'ensemble</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="stat-users">—</div><div class="stat-label">Guerriers enregistrés</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-visits">—</div><div class="stat-label">Visites totales</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-legends">—</div><div class="stat-label">Rang S+ atteints</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-news">—</div><div class="stat-label">Annonces actives</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="section-title">Top Guerriers</div>
+    <div id="dashboard-users" class="item-list"><div class="empty-state">Chargement…</div></div>
+  </div>
+
+  <!-- ── STOCK ── -->
+  <div class="tab-panel" id="tab-stock">
+    <div class="section-title">Gestion du Stock</div>
+    <div class="section-sub">Active ou désactive la disponibilité de chaque plat. Les items désactivés affichent "Épuisé" sur le menu.</div>
+    <div id="stockList"><div class="empty-state">Chargement…</div></div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="saveStock()">💾 Sauvegarder le stock</button>
+    </div>
+  </div>
+
+  <!-- ── PHOTOS ── -->
+  <div class="tab-panel" id="tab-photos">
+    <div class="section-title">Photos des Plats</div>
+    <div class="section-sub">Colle un lien d'image (Instagram, Google Photos, Imgur…) pour chaque plat. Laisse vide pour garder l'illustration.</div>
+    <div id="photoList"><div class="empty-state">Chargement…</div></div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="savePhotos()">💾 Sauvegarder les photos</button>
+    </div>
+  </div>
+
+  <!-- ── COO NEWS ── -->
+  <div class="tab-panel" id="tab-news">
+    <div class="section-title">📰 Coo News</div>
+    <div class="section-sub">Poste des annonces courtes — elles apparaissent sur le menu principal en temps réel.</div>
+    <!-- Formulaire nouvelle annonce -->
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;">
+      <div class="field">
+        <label class="label">Emoji</label>
+        <input class="input" id="newsEmoji" type="text" placeholder="📢 🎌 🔥 🎮 …" maxlength="4" style="font-size:1.2rem;text-align:center;">
+      </div>
+      <div class="field">
+        <label class="label">Titre (court)</label>
+        <input class="input" id="newsTitle" type="text" placeholder="Ex : Nouveau smoothie disponible !" maxlength="60">
+      </div>
+      <div class="field">
+        <label class="label">Texte de l'annonce</label>
+        <textarea class="textarea" id="newsText" placeholder="Ex : Notre nouveau Sage Mode Matcha Latte est arrivé ! Quantité limitée…" maxlength="200"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="postNews()">🪶 Publier l'annonce</button>
+    </div>
+    <!-- Liste des annonces -->
+    <div class="section-title" style="font-size:0.9rem;">Annonces publiées</div>
+    <div id="newsList" class="item-list"><div class="empty-state">Aucune annonce. Publie la première !</div></div>
+  </div>
+
+  <!-- ── GALERIE ── -->
+  <div class="tab-panel" id="tab-gallery">
+    <div class="section-title">🖼️ Galerie d'Ambiance</div>
+    <div class="section-sub">Ajoute des photos du café — elles s'affichent dans la section Galerie sur le menu.</div>
+    <!-- Ajouter une photo -->
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;">
+      <div class="field">
+        <label class="label">Lien de la photo (URL)</label>
+        <input class="input" id="galleryUrl" type="url" placeholder="https://…">
+      </div>
+      <div class="field">
+        <label class="label">Légende (optionnelle)</label>
+        <input class="input" id="galleryCaption" type="text" placeholder="Ex : Ambiance du soir 🌙" maxlength="50">
+      </div>
+      <button class="btn btn-success" onclick="addGalleryPhoto()">+ Ajouter la photo</button>
+    </div>
+    <div id="galleryAdminList" class="item-list"><div class="empty-state">Aucune photo. Ajoute la première !</div></div>
+  </div>
+
+  <!-- ── HORAIRES ── -->
+  <div class="tab-panel" id="tab-horaires">
+    <div class="section-title">⏰ Horaires d'Ouverture</div>
+    <div class="section-sub">Modifie les heures d'ouverture et de fermeture par jour. Ces horaires s'affichent sur le menu et contrôlent le badge Ouvert/Fermé.</div>
+    <div class="horaires-grid" id="horairesGrid"></div>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+      <div class="field">
+        <label class="label">Texte affiché sur le menu</label>
+        <textarea class="textarea" id="horairesText" placeholder="Lu–Ve : 08h–22h&#10;Sam : 09h–23h&#10;Dim : 10h–21h" style="height:80px;"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="saveHoraires()">💾 Sauvegarder les horaires</button>
+    </div>
+  </div>
+
+  <!-- ── INFOS ── -->
+  <div class="tab-panel" id="tab-infos">
+    <div class="section-title">⚙️ Informations du Café</div>
+    <div class="field"><label class="label">Numéro WhatsApp 1</label><input class="input" id="wa1" type="tel" placeholder="22373048945"></div>
+    <div class="field"><label class="label">Numéro WhatsApp 2</label><input class="input" id="wa2" type="tel" placeholder="22382790812"></div>
+    <div class="field"><label class="label">Lien Instagram</label><input class="input" id="instagram" type="url" placeholder="https://instagram.com/yumecafebamako"></div>
+    <div class="field"><label class="label">Lien TikTok</label><input class="input" id="tiktok" type="url" placeholder="https://tiktok.com/@yumecafebamako"></div>
+    <div class="field"><label class="label">URL Logo (optionnel)</label><input class="input" id="logoUrl" type="url" placeholder="https://…/logo.png"></div>
+    <div class="field"><label class="label">Lien Google Maps</label><input class="input" id="mapsUrl" type="url" placeholder="https://maps.app.goo.gl/…"></div>
+    <button class="btn btn-primary" onclick="saveInfos()">💾 Sauvegarder</button>
+  </div>
+
+  <!-- ── UTILISATEURS ── -->
+  <div class="tab-panel" id="tab-users">
+    <div class="section-title">👥 Guerriers enregistrés</div>
+    <div class="section-sub">Tous les visiteurs du café classés par nombre de visites.</div>
+    <div id="usersList"><div class="empty-state">Chargement…</div></div>
+  </div>
+
+  <!-- ── SAISONS ── -->
+  <div class="tab-panel" id="tab-saisons">
+    <div class="section-title">🌙 Gestion des Saisons</div>
+    <div class="season-card">
+      <div class="season-name" id="currentSeasonName">Saison actuelle</div>
+      <div class="season-info">Les saisons durent 3 mois. À la fin de chaque saison, le compteur de visites peut être remis à zéro pour relancer la compétition.</div>
+    </div>
+    <div class="field">
+      <label class="label">Nom de la nouvelle saison</label>
+      <input class="input" id="newSeasonName" placeholder="Ex : Saison Demon Slayer, Arc Wano…">
+    </div>
+    <button class="btn btn-success" onclick="updateSeason()" style="margin-bottom:12px;">🌙 Changer la saison</button>
+    <div class="divider"></div>
+    <div class="reset-warning">
+      ⚠️ <strong>Reset des compteurs</strong> — Cette action remet tous les compteurs de visites à zéro pour tout le monde. Elle est irréversible. À utiliser uniquement en début de nouvelle saison.
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn btn-danger" onclick="confirmReset()">🔄 Réinitialiser tous les rangs</button>
+    </div>
+    <div id="resetConfirm" style="display:none;margin-top:12px;padding:12px;background:rgba(255,48,48,0.08);border:1px solid var(--red);border-radius:8px;">
+      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">Tape <strong style="color:var(--red)">RESET</strong> pour confirmer :</p>
+      <input class="input" id="resetConfirmInput" type="text" placeholder="RESET" style="margin-bottom:8px;">
+      <button class="btn btn-danger btn-sm" onclick="doReset()">Confirmer le reset</button>
+    </div>
+  </div>
+
+</div><!-- /mainApp -->
+
+<!-- ── TOAST ── -->
+<div class="toast-wrap">
+  <div class="admin-toast" id="adminToast"></div>
+</div>
+
+<!-- ── PIN + UI (regular script — toujours disponible) ── -->
+<script>
+const ADMIN_PIN = '2427';
+let pinBuffer = '';
+
+function pinKey(k) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += k;
+  updateDots();
+  if (pinBuffer.length === 4) setTimeout(() => checkPin(), 150);
+}
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+  document.getElementById('pinError').textContent = '';
+}
+function updateDots() {
+  for (let i = 0; i < 4; i++)
+    document.getElementById('d' + i).classList.toggle('filled', i < pinBuffer.length);
+}
+function checkPin() {
+  if (pinBuffer === ADMIN_PIN) {
+    document.getElementById('pinScreen').classList.add('hidden');
+    document.getElementById('mainApp').style.display = 'block';
+    sessionStorage.setItem('yume-admin', '1');
+    if (typeof window._initAdmin === 'function') window._initAdmin();
+    else { const t = setInterval(() => { if (typeof window._initAdmin === 'function') { clearInterval(t); window._initAdmin(); } }, 100); }
+  } else {
+    document.getElementById('pinError').textContent = 'Code incorrect. Réessaie.';
+    pinBuffer = ''; updateDots();
+    const pad = document.querySelector('.pin-pad');
+    pad.style.transform = 'translateX(-8px)';
+    setTimeout(() => { pad.style.transform = 'translateX(8px)'; }, 80);
+    setTimeout(() => { pad.style.transform = ''; }, 160);
+  }
+}
+function logout() {
+  sessionStorage.removeItem('yume-admin');
+  document.getElementById('pinScreen').classList.remove('hidden');
+  document.getElementById('mainApp').style.display = 'none';
+  pinBuffer = ''; updateDots();
+}
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+  if (id === 'users')   { if (typeof window._loadUsers   === 'function') window._loadUsers(); }
+  if (id === 'stock')   { if (typeof window._renderStock === 'function') window._renderStock(); }
+  if (id === 'photos')  { if (typeof window._renderPhotos=== 'function') window._renderPhotos(); }
+  if (id === 'news')    { if (typeof window._loadNews    === 'function') window._loadNews(); }
+  if (id === 'gallery') { if (typeof window._loadGallery === 'function') window._loadGallery(); }
+  if (id === 'horaires'){ if (typeof window._renderHoraires==='function') window._renderHoraires(); }
+  if (id === 'infos')   { if (typeof window._loadInfos   === 'function') window._loadInfos(); }
+  if (id === 'saisons') { if (typeof window._loadSeason  === 'function') window._loadSeason(); }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+  FIREBASE + JS ADMIN
+═══════════════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getFirestore, collection, getDocs, getDoc, setDoc, updateDoc, addDoc, deleteDoc, doc, orderBy, query, limit, serverTimestamp, writeBatch }
+  from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getAuth, signInAnonymously }
+  from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAitsA_C6oTXTPoknF2LNG_QsTJhyQqP50",
+  authDomain: "yume-cafe.firebaseapp.com",
+  projectId: "yume-cafe",
+  storageBucket: "yume-cafe.firebasestorage.app",
+  messagingSenderId: "1048110365604",
+  appId: "1:1048110365604:web:f5bf7e91b85abf4a5fdf31"
+};
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+signInAnonymously(auth).catch(()=>{});
+
+// Auto-login si déjà connecté dans la session
+if (sessionStorage.getItem('yume-admin') === '1') {
+  document.getElementById('pinScreen').classList.add('hidden');
+  document.getElementById('mainApp').style.display = 'block';
+  initAdmin();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg, duration = 2800) {
+  const el = document.getElementById('adminToast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+function showSaveStatus() {
+  const el = document.getElementById('saveStatus');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── MENU ITEMS (pour stock + photos) ──────────────────────────
+const MENU_ITEMS = [
+  {name:'Mugiwara Classic',price:2000},{name:'Souffle du Soleil',price:1500},
+  {name:'Domaine Infini',price:1500},{name:'Katon Style 🔥',price:1500},
+  {name:'Titan Royale',price:3000},{name:'Super Saiyen Spicy',price:3000},
+  {name:'Sunny-Go Tropical',price:2000},{name:'Zangetsu Mango',price:2000},
+  {name:'Raikiri Lemon',price:1500},{name:'Perfect Ananas',price:1500},
+  {name:'Gomu Gomu Grenadine',price:1000},{name:'Sage Mode Matcha Latte',price:4500},
+  {name:'Jus Mangekyō Mangue',price:500},{name:'Jus Ananas no Mi',price:500},
+  {name:'Jus Citron Menthe Nen',price:500},{name:'Jus Gingembre Bankaï',price:500},
+  {name:'Jus Bissap Susanoo',price:500},{name:'Jus Tamarin Sharingan',price:500},
+  {name:'Jus Zaban Hakai',price:500},
+  {name:'Might Guy Mango Smoothie',price:2500},{name:'Spirit Bomb Tropical Mix',price:3000},
+  {name:'Banana Milk Smoothie de Yusuke',price:2500},{name:'Fraise Dream Sailor Moon',price:2000},
+  {name:'Gaufre Classique Konoha',price:1500},{name:'Gaufre Chocolat Akatsuki',price:2000},
+  {name:'Gaufre Banane Choco Gear 2',price:2500},{name:'Gaufre Mangue Vongola',price:2000},
+  {name:'Gaufre Oreo no Mi',price:3000},
+  {name:'Pancake Nature Happy',price:1000},{name:'Pancake Chocolat Mafia',price:1500},
+  {name:'Pancake Banane Miel de Chopper',price:1500},{name:'Pancake Peanut Butter Titans',price:1500},
+  {name:'Crêpe Nutella Shinigami',price:1500},{name:'Crêpe Banane Chocolat Fullmetal',price:2500},
+  {name:'Crêpe Caramel Beurre Alabasta',price:2000},{name:'Crêpe Mangue Mélodieuse',price:2000},
+  {name:'Crêpe Fraise Love ❤️',price:2000},{name:'Crêpe Oreo Dream Eater',price:2500},
+  {name:'Crêpe Poulet Fromage Hunter',price:3000},{name:'Crêpe Œuf Fromage Dragon Slayer',price:3500},
+  {name:"Crêpe Thon Fromage Levi's Choice",price:4000},
+  {name:'Ramen Squid Game',price:1500},{name:'Ramen Solo Flavoring',price:2000},
+  {name:'Ramen Tower of Ramyun',price:2500},{name:'Ramen Black Mamba',price:2500},
+  {name:'Ramen Dynamite 🔥',price:3000},
+  {name:"Cappuccino de l'Aube",price:1500},{name:'Café du Hokage',price:1000},
+  {name:'Chocolat Chaud Hotaru',price:1000},{name:'Limonade Maison Bubble Breath',price:1500},
+  {name:'Energy Drink Turbo Granny',price:1500},{name:'Salade de Fruits de la Paix',price:2000},
+  {name:'Croissant de Kiki',price:600},{name:'Œuf au Plat Dragon de Komodo',price:1000},
+];
+
+let stockData  = {};
+let photosData = {};
+
+// ── EXPOSE TO GLOBAL SCOPE ────────────────────────────────────
+// Called by the regular-script switchTab and checkPin
+function _exposeGlobals() {
+  window._initAdmin     = initAdmin;
+  window._loadUsers     = loadUsers;
+  window._renderStock   = renderStock;
+  window._renderPhotos  = renderPhotos;
+  window._loadNews      = loadNews;
+  window._loadGallery   = loadGalleryAdmin;
+  window._renderHoraires= renderHoraires;
+  window._loadInfos     = loadInfos;
+  window._loadSeason    = loadSeason;
+}
+// Expose immediately when module is parsed
+_exposeGlobals();
+
+// ── INIT ──────────────────────────────────────────────────────
+async function initAdmin() {
+  _exposeGlobals();
+  await loadConfigData();
+  await loadDashboard();
+  renderStock();
+  renderPhotos();
+  renderHoraires();
+  loadInfos();
+  loadSeason();
+}
+
+async function loadConfigData() {
+  try {
+    const ref = doc(db, 'config', 'settings');
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const d = snap.data();
+      stockData  = d.stock  || {};
+      photosData = d.photos || {};
+      if (d.horairesText) document.getElementById('horairesText').value = d.horairesText;
+      if (d.wa1)       document.getElementById('wa1').value       = d.wa1;
+      if (d.wa2)       document.getElementById('wa2').value       = d.wa2;
+      if (d.instagram) document.getElementById('instagram').value = d.instagram;
+      if (d.tiktok)    document.getElementById('tiktok').value    = d.tiktok;
+      if (d.logoUrl)   document.getElementById('logoUrl').value   = d.logoUrl;
+      if (d.mapsUrl)   document.getElementById('mapsUrl').value   = d.mapsUrl;
+      if (d.schedule)  scheduleData = {...DEFAULT_SCHEDULE, ...d.schedule};
+      if (d.season)    document.getElementById('currentSeasonName').textContent = d.season;
+    }
+  } catch(e) { console.warn('Config load:', e); }
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const usersSnap = await getDocs(collection(db, 'users'));
+    let totalVisits = 0, legends = 0;
+    const users = [];
+    usersSnap.forEach(d => {
+      const u = d.data();
+      totalVisits += u.visits || 0;
+      if ((u.visits||0) >= 85) legends++;
+      if (u.warriorName) users.push(u);
+    });
+    users.sort((a,b) => (b.visits||0)-(a.visits||0));
+    document.getElementById('stat-users').textContent  = usersSnap.size;
+    document.getElementById('stat-visits').textContent = totalVisits;
+    document.getElementById('stat-legends').textContent = legends;
+    const newsSnap = await getDocs(collection(db, 'news'));
+    document.getElementById('stat-news').textContent = newsSnap.size;
+    const RANKS=[
+      {min:0,emoji:'🌱',title:'Vagabond'},{min:3,emoji:'🏘️',title:'Habitué de Niamakoro'},
+      {min:7,emoji:'⚜️',title:'Citoyen de Yume'},{min:15,emoji:'⚔️',title:'Chasseur C'},
+      {min:25,emoji:'🔮',title:'Chevalier-Mage B'},{min:40,emoji:'🛡️',title:'Gardien A'},
+      {min:60,emoji:'⚓',title:'Commandant'},{min:85,emoji:'🔥',title:'Héros S'},
+      {min:120,emoji:'🌑',title:'Ombre SSS'},{min:200,emoji:'👻',title:'Fantôme'},
+    ];
+    const getRank = v => { let r=RANKS[0]; for(const x of RANKS){if(v>=x.min)r=x;} return r; };
+    const el = document.getElementById('dashboard-users');
+    if (users.length === 0) { el.innerHTML='<div class="empty-state">Pas encore de guerriers enregistrés.</div>'; return; }
+    el.innerHTML = users.slice(0,10).map(u => {
+      const r = getRank(u.visits||0);
+      return `<div class="user-card">
+        <div class="user-header">
+          <span class="user-emoji">${r.emoji}</span>
+          <div><div class="user-name">${u.warriorName||'Anonyme'}</div><div class="user-rank">${r.title}</div></div>
+        </div>
+        <div class="user-stats">
+          <span>Visites : <span>${u.visits||0}</span></span>
+          <span>XP : <span>${u.xp||0}</span></span>
+          <span>Saison : <span>${u.season||'—'}</span></span>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.warn('Dashboard:', e); }
+}
+
+// ── STOCK ─────────────────────────────────────────────────────
+function renderStock() {
+  const el = document.getElementById('stockList');
+  el.innerHTML = MENU_ITEMS.map(item => {
+    const available = stockData[item.name] !== false;
+    return `<div class="stock-item">
+      <div>
+        <div class="stock-name">${item.name}</div>
+        <div class="stock-price">${item.price.toLocaleString()} FCFA</div>
+      </div>
+      <div class="toggle-wrap">
+        <label class="toggle">
+          <input type="checkbox" ${available?'checked':''} onchange="updateStock('${item.name.replace(/'/g,"\\'")}', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label" style="color:${available?'var(--green)':'var(--red)'}">${available?'Dispo':'Épuisé'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStock(name, available) {
+  stockData[name] = available;
+  // Mettre à jour le label
+  const labels = document.querySelectorAll('.toggle-label');
+  // Chercher la bonne ligne
+  document.querySelectorAll('.stock-item').forEach(item => {
+    const n = item.querySelector('.stock-name').textContent;
+    if (n === name) {
+      const lbl = item.querySelector('.toggle-label');
+      lbl.textContent = available ? 'Dispo' : 'Épuisé';
+      lbl.style.color = available ? 'var(--green)' : 'var(--red)';
+    }
+  });
+}
+window.updateStock = updateStock;
+
+async function saveStock() {
+  try {
+    await setDoc(doc(db, 'config', 'settings'), { stock: stockData }, { merge: true });
+    toast('✅ Stock sauvegardé !'); showSaveStatus();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.saveStock = saveStock;
+
+// ── PHOTOS ────────────────────────────────────────────────────
+function renderPhotos() {
+  const el = document.getElementById('photoList');
+  el.innerHTML = MENU_ITEMS.filter(i => !i.name.startsWith('Jus ')).map(item => {
+    const url = photosData[item.name] || '';
+    const safeId = 'photo_' + item.name.replace(/[^a-zA-Z0-9]/g,'_');
+    return `<div class="photo-item">
+      <div style="flex:1;">
+        <div class="photo-name">${item.name}</div>
+        <input class="photo-input" id="${safeId}" type="url" placeholder="Coller le lien de la photo…" value="${url}"
+          onchange="updatePhoto('${item.name.replace(/'/g,"\\'")}', this.value)">
+      </div>
+      ${url ? `<img class="photo-preview" src="${url}" onerror="this.style.display='none'" loading="lazy">` : '<div style="width:40px;height:40px;border-radius:6px;background:var(--bg);border:1px dashed var(--border);"></div>'}
+    </div>`;
+  }).join('');
+}
+
+function updatePhoto(name, url) {
+  photosData[name] = url;
+}
+window.updatePhoto = updatePhoto;
+
+async function savePhotos() {
+  try {
+    await setDoc(doc(db, 'config', 'settings'), { photos: photosData }, { merge: true });
+    toast('✅ Photos sauvegardées !'); showSaveStatus();
+    renderPhotos();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.savePhotos = savePhotos;
+
+// ── COO NEWS ──────────────────────────────────────────────────
+async function loadNews() {
+  try {
+    const q = query(collection(db, 'news'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    const el = document.getElementById('newsList');
+    if (snap.empty) { el.innerHTML='<div class="empty-state">Aucune annonce.</div>'; return; }
+    el.innerHTML = '';
+    snap.forEach(d => {
+      const n = d.data();
+      const date = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleDateString('fr-FR') : '';
+      el.innerHTML += `<div class="item-card">
+        <span class="item-emoji">${n.emoji||'📰'}</span>
+        <div class="item-card-content">
+          <div class="item-card-title">${n.title||''}</div>
+          <div class="item-card-meta">${n.text||''}<br><small>${date}</small></div>
+        </div>
+        <div class="item-card-actions">
+          <button class="btn btn-danger btn-sm" onclick="deleteNews('${d.id}')">🗑️</button>
+        </div>
+      </div>`;
+    });
+  } catch(e) { console.warn('News:', e); }
+}
+
+async function postNews() {
+  const emoji = document.getElementById('newsEmoji').value.trim() || '📰';
+  const title = document.getElementById('newsTitle').value.trim();
+  const text  = document.getElementById('newsText').value.trim();
+  if (!title) { toast('⚠️ Le titre est obligatoire.'); return; }
+  try {
+    await addDoc(collection(db, 'news'), { emoji, title, text, createdAt: serverTimestamp() });
+    document.getElementById('newsEmoji').value = '';
+    document.getElementById('newsTitle').value = '';
+    document.getElementById('newsText').value  = '';
+    toast('🪶 Annonce publiée !');
+    loadNews();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.postNews = postNews;
+
+async function deleteNews(id) {
+  if (!confirm('Supprimer cette annonce ?')) return;
+  try {
+    await deleteDoc(doc(db, 'news', id));
+    toast('🗑️ Annonce supprimée.'); loadNews();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.deleteNews = deleteNews;
+
+// ── GALERIE ───────────────────────────────────────────────────
+async function loadGalleryAdmin() {
+  try {
+    const snap = await getDocs(collection(db, 'gallery'));
+    const el = document.getElementById('galleryAdminList');
+    if (snap.empty) { el.innerHTML='<div class="empty-state">Aucune photo.</div>'; return; }
+    el.innerHTML = '';
+    snap.forEach(d => {
+      const g = d.data();
+      el.innerHTML += `<div class="item-card">
+        <img src="${g.url}" style="width:50px;height:50px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="this.style.opacity=0.2">
+        <div class="item-card-content">
+          <div class="item-card-title">${g.caption||'Sans titre'}</div>
+          <div class="item-card-meta" style="word-break:break-all;font-size:0.6rem;">${g.url.substring(0,60)}…</div>
+        </div>
+        <div class="item-card-actions">
+          <button class="btn btn-danger btn-sm" onclick="deleteGalleryPhoto('${d.id}')">🗑️</button>
+        </div>
+      </div>`;
+    });
+  } catch(e) { console.warn('Gallery:', e); }
+}
+
+async function addGalleryPhoto() {
+  const url     = document.getElementById('galleryUrl').value.trim();
+  const caption = document.getElementById('galleryCaption').value.trim();
+  if (!url) { toast('⚠️ URL obligatoire.'); return; }
+  try {
+    await addDoc(collection(db, 'gallery'), { url, caption, createdAt: serverTimestamp() });
+    document.getElementById('galleryUrl').value     = '';
+    document.getElementById('galleryCaption').value = '';
+    toast('✅ Photo ajoutée !'); loadGalleryAdmin();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.addGalleryPhoto = addGalleryPhoto;
+
+async function deleteGalleryPhoto(id) {
+  if (!confirm('Supprimer cette photo ?')) return;
+  try {
+    await deleteDoc(doc(db, 'gallery', id));
+    toast('🗑️ Photo supprimée.'); loadGalleryAdmin();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.deleteGalleryPhoto = deleteGalleryPhoto;
+
+// ── HORAIRES ──────────────────────────────────────────────────
+const DEFAULT_SCHEDULE = {
+  0:{open:10,close:21},1:{open:8,close:22},2:{open:8,close:22},
+  3:{open:8,close:22},4:{open:8,close:22},5:{open:8,close:22},6:{open:9,close:23}
+};
+let scheduleData = {...DEFAULT_SCHEDULE};
+const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+
+function renderHoraires() {
+  const grid = document.getElementById('horairesGrid');
+  grid.innerHTML = DAYS_FR.map((day, i) => {
+    const sch = scheduleData[i] || DEFAULT_SCHEDULE[i];
+    return `<div class="horaire-row">
+      <div class="horaire-day">${day}</div>
+      <input class="horaire-input" type="number" min="0" max="23" value="${sch.open}"
+        onchange="scheduleData[${i}]={...scheduleData[${i}],open:parseInt(this.value)}" placeholder="Ouv.">
+      <input class="horaire-input" type="number" min="0" max="23" value="${sch.close}"
+        onchange="scheduleData[${i}]={...scheduleData[${i}],close:parseInt(this.value)}" placeholder="Ferm.">
+    </div>`;
+  }).join('');
+}
+
+async function saveHoraires() {
+  const text = document.getElementById('horairesText').value.trim();
+  try {
+    await setDoc(doc(db, 'config', 'settings'), { schedule: scheduleData, horairesText: text }, { merge: true });
+    toast('✅ Horaires sauvegardés !'); showSaveStatus();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.saveHoraires = saveHoraires;
+
+// ── INFOS ─────────────────────────────────────────────────────
+async function loadInfos() {
+  // Déjà chargé dans loadConfigData
+}
+window.loadInfos = loadInfos;
+
+async function saveInfos() {
+  const data = {
+    wa1:       document.getElementById('wa1').value.trim(),
+    wa2:       document.getElementById('wa2').value.trim(),
+    instagram: document.getElementById('instagram').value.trim(),
+    tiktok:    document.getElementById('tiktok').value.trim(),
+    logoUrl:   document.getElementById('logoUrl').value.trim(),
+    mapsUrl:   document.getElementById('mapsUrl').value.trim(),
+  };
+  try {
+    await setDoc(doc(db, 'config', 'settings'), data, { merge: true });
+    toast('✅ Infos sauvegardées !'); showSaveStatus();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.saveInfos = saveInfos;
+
+// ── UTILISATEURS ──────────────────────────────────────────────
+async function loadUsers() {
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    const users = [];
+    snap.forEach(d => users.push(d.data()));
+    users.sort((a,b) => (b.visits||0)-(a.visits||0));
+    const RANKS=[
+      {min:0,emoji:'🌱',title:'Vagabond'},{min:3,emoji:'🏘️',title:'Habitué de Niamakoro'},
+      {min:7,emoji:'⚜️',title:'Citoyen de Yume'},{min:15,emoji:'⚔️',title:'Chasseur C'},
+      {min:25,emoji:'🔮',title:'Chevalier-Mage B'},{min:40,emoji:'🛡️',title:'Gardien A'},
+      {min:60,emoji:'⚓',title:'Commandant'},{min:85,emoji:'🔥',title:'Héros S'},
+      {min:120,emoji:'🌑',title:'Ombre SSS'},{min:200,emoji:'👻',title:'Fantôme'},
+    ];
+    const getRank = v => { let r=RANKS[0]; for(const x of RANKS){if(v>=x.min)r=x;} return r; };
+    const el = document.getElementById('usersList');
+    if (users.length === 0) { el.innerHTML='<div class="empty-state">Pas encore de guerriers.</div>'; return; }
+    el.innerHTML = users.map(u => {
+      const r = getRank(u.visits||0);
+      const last = u.lastVisit ? new Date(u.lastVisit).toLocaleDateString('fr-FR') : '—';
+      return `<div class="user-card">
+        <div class="user-header">
+          <span class="user-emoji">${r.emoji}</span>
+          <div>
+            <div class="user-name">${u.warriorName||'Sans nom'}</div>
+            <div class="user-rank">${r.title}</div>
+          </div>
+        </div>
+        <div class="user-stats">
+          <span>Visites : <span>${u.visits||0}</span></span>
+          <span>XP : <span>${u.xp||0}</span></span>
+          <span>Dernière : <span>${last}</span></span>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.warn('Users:', e); }
+}
+window.loadUsers = loadUsers;
+
+// ── SAISONS ───────────────────────────────────────────────────
+async function loadSeason() {
+  try {
+    const ref  = doc(db, 'config', 'settings');
+    const snap = await getDoc(ref);
+    if (snap.exists() && snap.data().season) {
+      document.getElementById('currentSeasonName').textContent = snap.data().season;
+    }
+  } catch(e) {}
+}
+
+async function updateSeason() {
+  const name = document.getElementById('newSeasonName').value.trim();
+  if (!name) { toast('⚠️ Donne un nom à la saison.'); return; }
+  try {
+    await setDoc(doc(db, 'config', 'settings'), { season: name }, { merge: true });
+    document.getElementById('currentSeasonName').textContent = name;
+    document.getElementById('newSeasonName').value = '';
+    toast('🌙 Saison mise à jour !'); showSaveStatus();
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.updateSeason = updateSeason;
+
+function confirmReset() {
+  document.getElementById('resetConfirm').style.display = 'block';
+}
+window.confirmReset = confirmReset;
+
+async function doReset() {
+  const val = document.getElementById('resetConfirmInput').value.trim();
+  if (val !== 'RESET') { toast('⚠️ Tape exactement RESET pour confirmer.'); return; }
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    const batch = writeBatch(db);
+    snap.forEach(d => {
+      batch.update(d.ref, { visits: 0, xp: 0 });
+    });
+    await batch.commit();
+    document.getElementById('resetConfirm').style.display = 'none';
+    document.getElementById('resetConfirmInput').value = '';
+    toast('🔄 Tous les rangs ont été remis à zéro.', 4000);
+  } catch(e) { toast('❌ Erreur : ' + e.message); }
+}
+window.doReset = doReset;
+
+</script>
+</body>
+</html>
