@@ -134,28 +134,27 @@ body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans
 .warrior-input:focus{border-color:var(--gold);}
 .warrior-submit{width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--pink));border:none;cursor:pointer;color:var(--ink);font-weight:800;font-size:0.9rem;font-family:'M PLUS Rounded 1c',sans-serif;}
 
-/* ── INFO STRIP ── */
-.info-strip{background:var(--surface);border-top:1px solid var(--border-gold);border-bottom:1px solid var(--border-gold);padding:16px 14px;}
-.info-strip-inner{display:flex;flex-direction:column;gap:10px;}
-.info-horaires{background:rgba(232,184,75,0.06);border:1px solid var(--border-gold);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
-.info-horaires-icon{font-size:1.4rem;flex-shrink:0;}
-.info-horaires-content{flex:1;}
-.info-horaires-title{font-size:0.6rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
-.info-horaires-text{font-size:0.72rem;color:var(--text);font-weight:700;line-height:1.6;}
-.info-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.info-block{background:var(--surface2);border:1px solid var(--border-gold);border-radius:12px;padding:12px;}
-.info-block-title{font-size:0.58rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:4px;}
-.info-block-title.gold{color:var(--gold);}
-.info-block-title.pink{color:var(--pink);}
-.info-block-title.teal{color:var(--teal);}
-.info-item{font-size:0.68rem;color:var(--muted);line-height:1.7;}
-.info-item a{color:var(--text);text-decoration:none;font-weight:700;}
-.info-item a:hover{color:var(--gold);}
-.map-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 10px;border:1px solid var(--teal);border-radius:20px;color:var(--teal);font-size:0.6rem;font-weight:800;text-decoration:none;}
-.social-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
-.soc-btn{padding:4px 9px;border-radius:20px;font-size:0.6rem;font-weight:800;text-decoration:none;border:1px solid;}
-.soc-ig{color:var(--pink);border-color:var(--pink);}
-.soc-tt{color:var(--text);border-color:var(--muted);}
+/* ── INFO SECTIONS ── */
+.info-sections{background:var(--surface);border-top:2px solid var(--border-gold);border-bottom:2px solid var(--border-gold);padding:18px 16px;display:flex;flex-direction:column;gap:22px;}
+.info-sec-title{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.info-sec-icon{font-size:1.1rem;}
+.info-sec-label{font-family:'Bangers',cursive;font-size:1.15rem;letter-spacing:0.12em;color:var(--teal);}
+.horaires-week{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;}
+.horaire-day-row{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.horaire-day-name{font-size:0.8rem;font-weight:800;color:var(--text);}
+.horaire-day-time{font-size:0.78rem;font-weight:700;color:var(--gold);}
+.horaire-day-time.ferme{color:var(--pink);}
+.info-address{font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+.map-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;background:rgba(38,208,206,0.08);border:1px solid var(--teal);border-radius:24px;color:var(--teal);font-size:0.78rem;font-weight:800;text-decoration:none;transition:all 0.2s;}
+.map-btn:hover{background:rgba(38,208,206,0.18);}
+.contact-nums{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.contact-num{display:inline-flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:800;color:var(--gold);text-decoration:none;}
+.social-row{display:flex;gap:10px;flex-wrap:wrap;}
+.soc-card{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:0.78rem;font-weight:800;text-decoration:none;border:1px solid;transition:all 0.2s;}
+.soc-card:hover{transform:scale(1.04);}
+.soc-ig{color:var(--pink);border-color:var(--pink);background:rgba(255,79,163,0.08);}
+.soc-tt{color:var(--text);border-color:var(--muted);background:rgba(255,255,255,0.04);}
+@media(max-width:360px){.horaires-week{grid-template-columns:1fr;}}
 
 /* ── SEARCH ── */
 .search-section{padding:10px 12px 0;}
@@ -473,37 +472,60 @@ body,body *{transition:background-color 0.6s ease,border-color 0.4s ease,color 0
   </div>
 </div>
 
-<!-- ── INFO STRIP ── -->
-<div class="info-strip">
-  <div class="info-strip-inner">
-    <!-- Horaires – pleine largeur -->
-    <div class="info-horaires">
-      <div class="info-horaires-icon">⏰</div>
-      <div class="info-horaires-content">
-        <div class="info-horaires-title">Horaires d'ouverture</div>
-        <div class="info-horaires-text" id="horairesDisplay">Lu–Ve : 08h–22h &nbsp;·&nbsp; Sam : 09h–23h &nbsp;·&nbsp; Dim : 10h–21h</div>
-      </div>
+<!-- ── INFO SECTIONS ── -->
+<div class="info-sections">
+
+  <!-- HORAIRES -->
+  <div>
+    <div class="info-sec-title">
+      <span class="info-sec-icon">🕐</span>
+      <span class="info-sec-label">HORAIRES</span>
     </div>
-    <!-- Adresse + Contact côte à côte -->
-    <div class="info-row2">
-      <div class="info-block">
-        <div class="info-block-title teal">📍 Adresse</div>
-        <div class="info-item">Bamako<br>Niamakoro</div>
-        <a href="https://maps.app.goo.gl/2A7sCJ9Txf6GSMom9" target="_blank" class="map-link">🗺️ Maps</a>
-      </div>
-      <div class="info-block">
-        <div class="info-block-title pink">📱 Contact</div>
-        <div class="info-item">
-          <a href="tel:+22373048945">📞 73 04 89 45</a><br>
-          <a href="tel:+22382790812">📞 82 79 08 12</a>
-        </div>
-        <div class="social-links">
-          <a href="https://www.instagram.com/yumecafebamako" target="_blank" class="soc-btn soc-ig">Instagram</a>
-          <a href="https://www.tiktok.com/@yumecafebamako" target="_blank" class="soc-btn soc-tt">TikTok</a>
-        </div>
-      </div>
+    <div class="horaires-week" id="horairesDisplay">
+      <div class="horaire-day-row"><span class="horaire-day-name">Lundi</span><span class="horaire-day-time ferme">Fermé</span></div>
+      <div class="horaire-day-row"><span class="horaire-day-name">Mardi</span><span class="horaire-day-time">10h–19h</span></div>
+      <div class="horaire-day-row"><span class="horaire-day-name">Mercredi</span><span class="horaire-day-time">10h–19h</span></div>
+      <div class="horaire-day-row"><span class="horaire-day-name">Jeudi</span><span class="horaire-day-time">10h–19h</span></div>
+      <div class="horaire-day-row"><span class="horaire-day-name">Vendredi</span><span class="horaire-day-time">10h–21h/22h</span></div>
+      <div class="horaire-day-row"><span class="horaire-day-name">Samedi</span><span class="horaire-day-time">10h–21h/22h</span></div>
+      <div class="horaire-day-row"><span class="horaire-day-name">Dimanche</span><span class="horaire-day-time">10h–21h/22h</span></div>
     </div>
   </div>
+
+  <!-- NOUS TROUVER -->
+  <div>
+    <div class="info-sec-title">
+      <span class="info-sec-icon">📍</span>
+      <span class="info-sec-label">NOUS TROUVER</span>
+    </div>
+    <div class="info-address">Bamako, Niamakoro</div>
+    <a href="https://maps.app.goo.gl/2A7sCJ9Txf6GSMom9" target="_blank" class="map-btn">🗺️ Voir sur Google Maps</a>
+  </div>
+
+  <!-- CONTACT -->
+  <div>
+    <div class="info-sec-title">
+      <span class="info-sec-icon">📞</span>
+      <span class="info-sec-label">CONTACT</span>
+    </div>
+    <div class="contact-nums">
+      <a href="tel:+22373048945" class="contact-num"><span>📱</span> 73 04 89 45</a>
+      <a href="tel:+22382790812" class="contact-num"><span>📱</span> 82 79 08 12</a>
+    </div>
+  </div>
+
+  <!-- RÉSEAUX SOCIAUX -->
+  <div>
+    <div class="info-sec-title">
+      <span class="info-sec-icon">🌐</span>
+      <span class="info-sec-label">RÉSEAUX SOCIAUX</span>
+    </div>
+    <div class="social-row">
+      <a href="https://www.instagram.com/yumecafebamako" target="_blank" class="soc-card soc-ig">📸 Instagram</a>
+      <a href="https://www.tiktok.com/@yumecafebamako" target="_blank" class="soc-card soc-tt">🎵 TikTok</a>
+    </div>
+  </div>
+
 </div>
 
 <!-- ── COO NEWS ── -->
@@ -861,7 +883,7 @@ var userData     = {};
 var manualTheme  = false;
 var deferredInstall = null;
 var SCHEDULE = {
-  0:{open:10,close:21},1:{open:8,close:22},2:{open:8,close:22},
+  0:{open:10,close:21},1:{closed:true,open:8,close:22},2:{open:8,close:22},
   3:{open:8,close:22},4:{open:8,close:22},5:{open:8,close:22},6:{open:9,close:23}
 };
 
@@ -920,6 +942,22 @@ function toggleTheme() {
 })();
 setInterval(function() { if (!manualTheme) applyTheme(getAutoTheme()); }, 60000);
 
+// ── AFFICHAGE HORAIRES DYNAMIQUE ──────────────────────────────
+var DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+function renderHorairesDisplay(schedule) {
+  var el = document.getElementById('horairesDisplay');
+  if (!el) return;
+  // Reorder: Lundi first (1..6, then 0)
+  var order = [1,2,3,4,5,6,0];
+  el.innerHTML = order.map(function(i) {
+    var sch = (schedule && schedule[i]) ? schedule[i] : window.SCHEDULE[i] || {};
+    var timeStr = sch.closed
+      ? '<span class="horaire-day-time ferme">Fermé</span>'
+      : '<span class="horaire-day-time">' + (sch.open||'?') + 'h–' + (sch.close||'?') + 'h</span>';
+    return '<div class="horaire-day-row"><span class="horaire-day-name">' + DAYS_FR[i] + '</span>' + timeStr + '</div>';
+  }).join('');
+}
+
 // ── STATUT OUVERT / FERMÉ ─────────────────────────────────────
 function updateStatus() {
   var now = new Date();
@@ -929,6 +967,11 @@ function updateStatus() {
   var badge = document.getElementById('statusBadge');
   var txt   = document.getElementById('statusText');
   if (!badge || !txt) return;
+  if (sch.closed) {
+    badge.className = 'status-badge status-closed';
+    txt.textContent = 'FERMÉ · Repos du lundi';
+    return;
+  }
   var isOpen = h >= sch.open && h < sch.close;
   badge.className = 'status-badge ' + (isOpen ? 'status-open' : 'status-closed');
   txt.textContent = isOpen
@@ -1410,8 +1453,15 @@ async function loadConfig() {
     onSnapshot(ref, (snap) => {
       if (!snap.exists()) return;
       const data = snap.data();
-      if (data.schedule) { window.SCHEDULE = {...window.SCHEDULE, ...data.schedule}; updateStatus(); }
-      if (data.horairesText) { const el=document.getElementById('horairesDisplay'); if(el) el.innerHTML=data.horairesText; }
+      if (data.schedule) {
+        window.SCHEDULE = {...window.SCHEDULE, ...data.schedule};
+        updateStatus();
+        // Mettre à jour l'affichage des horaires dynamiquement
+        renderHorairesDisplay(data.schedule);
+      }
+      if (data.horairesText) {
+        // Compatibilité ancienne version — ignoré si schedule existe
+      }
       if (data.stock) {
         Object.entries(data.stock).forEach(([name, available]) => {
           document.querySelectorAll(`[data-name="${name}"]`).forEach(card => {
@@ -1432,8 +1482,67 @@ async function loadConfig() {
           });
         });
       }
+      // Prix personnalisés
+      if (data.menuPrices) {
+        Object.entries(data.menuPrices).forEach(([name, price]) => {
+          document.querySelectorAll(`[data-name="${name}"]`).forEach(card => {
+            card.dataset.price = price;
+            const mc = card.querySelector('.mc-price');
+            if (mc) mc.innerHTML = `${Number(price).toLocaleString()}<span class="fcfa">FCFA</span>`;
+            const jc = card.querySelector('.jc-price');
+            if (jc) jc.textContent = `${Number(price).toLocaleString()}F`;
+          });
+        });
+      }
+      // Items masqués
+      if (data.menuHidden) {
+        data.menuHidden.forEach(name => {
+          document.querySelectorAll(`[data-name="${name}"]`).forEach(card => {
+            card.style.display = 'none';
+          });
+        });
+      }
     });
   } catch(e) {}
+}
+
+// ── MENU CUSTOM (plats ajoutés via l'admin) ───────────────────
+async function loadCustomMenu() {
+  try {
+    const snap = await getDocs(collection(db,'customMenu'));
+    if (snap.empty) return;
+    snap.forEach(d => {
+      const item = {...d.data(), id: d.id};
+      renderCustomItem(item);
+    });
+  } catch(e) {}
+}
+
+function renderCustomItem(item) {
+  const selectors = {
+    the:'[data-s="the"] .menu-grid', fruit:'[data-s="fruit"] .menu-grid',
+    jus:'[data-s="jus"] .jus-grid', smoothie:'[data-s="smoothie"] .menu-grid',
+    gaufre:'[data-s="gaufre"] .menu-grid', pancake:'[data-s="pancake"] .menu-grid',
+    crepe:'[data-s="crepe"] .menu-grid', ramen:'[data-s="ramen"] .menu-grid',
+    autre:'[data-s="autre"] .menu-grid',
+  };
+  const grid = document.querySelector(selectors[item.cat] || selectors.autre);
+  if (!grid) return;
+  const el = document.createElement('div');
+  el.className = `mc${item.premium ? ' premium' : ''}`;
+  el.dataset.name = item.name;
+  el.dataset.price = item.price;
+  el.innerHTML = `
+    <div class="mc-illus"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><circle cx="12" cy="12" r="8" fill="rgba(232,184,75,0.1)"/><path d="M12 8v4l3 3" stroke="var(--gold)"/></svg></div>
+    <div>
+      <div class="mc-name">${item.name}</div>
+      ${item.desc ? `<div class="mc-desc">${item.desc}</div>` : ''}
+      ${item.tag  ? `<span class="mc-tag">${item.tag}</span>` : ''}
+    </div>
+    <div class="mc-price">${Number(item.price).toLocaleString()}<span class="fcfa">FCFA</span></div>
+    <button class="mc-cart" onclick="addToCart(this)">Ajouter</button>
+  `;
+  grid.appendChild(el);
 }
 
 // ── INIT FIREBASE ────────────────────────────────────────────
@@ -1442,6 +1551,7 @@ loadCooNews();
 loadGallery();
 loadHallOfFame();
 loadConfig();
+loadCustomMenu();
 </script>
 </body>
 </html>

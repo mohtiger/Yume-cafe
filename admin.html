@@ -68,9 +68,21 @@ body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans
 .btn-primary{background:linear-gradient(135deg,var(--gold),var(--pink));color:var(--ink);}
 .btn-success{background:linear-gradient(135deg,var(--teal),var(--blue));color:var(--ink);}
 .btn-danger{background:rgba(255,48,48,0.15);border:1px solid var(--red);color:var(--red);}
-.btn-sm{padding:6px 12px;font-size:0.7rem;border-radius:8px;}
+.btn-sm{padding:6px 12px;font-size:0.7rem;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.btn-sm.active-cat{background:var(--gold);color:var(--ink);border-color:var(--gold);}
 .btn:hover{transform:scale(1.03);}
 .btn:active{transform:scale(0.97);}
+
+/* ── MENU ADMIN ROWS ── */
+.menu-item-row{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;transition:opacity 0.2s;}
+.menu-item-row.hidden-item{opacity:0.4;}
+.menu-item-name{font-size:0.75rem;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.menu-item-cat{font-size:0.6rem;color:var(--muted);}
+.menu-price-input{width:80px;padding:5px 8px;background:var(--surface);border:1px solid var(--border-gold);border-radius:6px;color:var(--text);font-family:'M PLUS Rounded 1c',sans-serif;font-size:0.75rem;font-weight:800;text-align:center;}
+.menu-price-input:focus{outline:none;border-color:var(--gold);}
+.btn-icon{padding:5px 8px;border-radius:6px;border:none;cursor:pointer;font-size:0.8rem;background:transparent;transition:all 0.2s;}
+.btn-icon:hover{background:var(--surface);}
+.custom-badge{font-size:0.55rem;padding:2px 6px;background:rgba(79,195,247,0.15);border:1px solid var(--teal);border-radius:10px;color:var(--teal);margin-left:4px;}
 
 /* ── CARDS LISTE ── */
 .item-list{display:flex;flex-direction:column;gap:8px;}
@@ -96,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans
 
 /* ── HORAIRES GRID ── */
 .horaires-grid{display:flex;flex-direction:column;gap:8px;}
-.horaire-row{display:grid;grid-template-columns:80px 1fr 1fr;gap:8px;align-items:center;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;}
+.horaire-row{display:grid;grid-template-columns:80px 44px 40px 60px 60px;gap:8px;align-items:center;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;}
 .horaire-day{font-size:0.75rem;font-weight:800;color:var(--gold);}
 .horaire-input{padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem;outline:none;width:100%;text-align:center;}
 .horaire-input:focus{border-color:var(--gold);}
@@ -191,6 +203,7 @@ body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans
     <button class="tab-btn" onclick="switchTab('infos',this)">⚙️ Infos</button>
     <button class="tab-btn" onclick="switchTab('users',this)">👥 Utilisateurs</button>
     <button class="tab-btn" onclick="switchTab('saisons',this)">🌙 Saisons</button>
+    <button class="tab-btn" onclick="switchTab('menu',this)">🍽️ Menu</button>
   </div>
 
   <!-- ── DASHBOARD ── -->
@@ -330,6 +343,57 @@ body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans
     </div>
   </div>
 
+  <!-- ── MENU ── -->
+  <div class="tab-panel" id="tab-menu">
+    <div class="section-title">🍽️ Gestion du Menu</div>
+    <div class="section-sub">Modifie les prix, masque des plats ou ajoute de nouveaux items. Les changements apparaissent immédiatement sur le menu client.</div>
+
+    <!-- Filtre catégorie -->
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="menuCatFilter">
+      <button class="btn btn-sm active-cat" onclick="filterMenuAdmin('all',this)">Tous</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('the',this)">🍵 Thés</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('fruit',this)">🫧 Fruit Tea</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('jus',this)">🥤 Jus</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('smoothie',this)">🥤 Smoothies</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('gaufre',this)">🧇 Gaufres</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('pancake',this)">🥞 Pancakes</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('crepe',this)">🫓 Crêpes</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('ramen',this)">🍜 Ramen</button>
+      <button class="btn btn-sm" onclick="filterMenuAdmin('autre',this)">✨ Autres</button>
+    </div>
+
+    <!-- Liste items -->
+    <div id="menuAdminList"><div class="empty-state">Chargement…</div></div>
+
+    <!-- Formulaire ajout -->
+    <div class="divider" style="margin:20px 0;"></div>
+    <div class="section-title">➕ Ajouter un nouveau plat</div>
+    <div class="field"><label class="label">Nom du plat *</label><input class="input" id="newItemName" placeholder="Ex: Dragon Ball Smoothie" maxlength="60"></div>
+    <div class="field"><label class="label">Prix (FCFA) *</label><input class="input" id="newItemPrice" type="number" min="0" placeholder="Ex: 2500"></div>
+    <div class="field">
+      <label class="label">Catégorie *</label>
+      <select class="input" id="newItemCat">
+        <option value="">— Choisir —</option>
+        <option value="the">🍵 Thés au Lait</option>
+        <option value="fruit">🫧 Fruit Tea</option>
+        <option value="jus">🥤 Jus Frais</option>
+        <option value="smoothie">🥤 Smoothies</option>
+        <option value="gaufre">🧇 Gaufres</option>
+        <option value="pancake">🥞 Pancakes</option>
+        <option value="crepe">🫓 Crêpes</option>
+        <option value="ramen">🍜 Ramen</option>
+        <option value="autre">✨ Autres</option>
+      </select>
+    </div>
+    <div class="field"><label class="label">Tag / Série (optionnel)</label><input class="input" id="newItemTag" placeholder="Ex: Naruto, One Piece…" maxlength="30"></div>
+    <div class="field"><label class="label">Description courte (optionnelle)</label><input class="input" id="newItemDesc" placeholder="Ex: « Doux et épicé comme un ninja »" maxlength="80"></div>
+    <div class="field" style="flex-direction:row;align-items:center;gap:10px;">
+      <label class="label" style="margin:0;">⭐ Premium</label>
+      <input type="checkbox" id="newItemPremium" style="width:18px;height:18px;cursor:pointer;">
+    </div>
+    <button class="btn btn-success" onclick="addMenuItem()" style="margin-top:4px;">➕ Ajouter au menu</button>
+  </div>
+
 </div><!-- /mainApp -->
 
 <!-- ── TOAST ── -->
@@ -392,6 +456,7 @@ function switchTab(id, btn) {
   if (id === 'horaires'){ if (typeof window._renderHoraires==='function') window._renderHoraires(); }
   if (id === 'infos')   { if (typeof window._loadInfos   === 'function') window._loadInfos(); }
   if (id === 'saisons') { if (typeof window._loadSeason  === 'function') window._loadSeason(); }
+  if (id === 'menu')    { if (typeof window._loadMenuAdmin === 'function') window._loadMenuAdmin(); }
 }
 </script>
 
@@ -438,54 +503,58 @@ function showSaveStatus() {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-// ── MENU ITEMS (pour stock + photos) ──────────────────────────
+// ── MENU ITEMS (pour stock + photos + menu admin) ─────────────
 const MENU_ITEMS = [
-  {name:'Mugiwara Classic',price:2000},{name:'Souffle du Soleil',price:1500},
-  {name:'Domaine Infini',price:1500},{name:'Katon Style 🔥',price:1500},
-  {name:'Titan Royale',price:3000},{name:'Super Saiyen Spicy',price:3000},
-  {name:'Sunny-Go Tropical',price:2000},{name:'Zangetsu Mango',price:2000},
-  {name:'Raikiri Lemon',price:1500},{name:'Perfect Ananas',price:1500},
-  {name:'Gomu Gomu Grenadine',price:1000},{name:'Sage Mode Matcha Latte',price:4500},
-  {name:'Jus Mangekyō Mangue',price:500},{name:'Jus Ananas no Mi',price:500},
-  {name:'Jus Citron Menthe Nen',price:500},{name:'Jus Gingembre Bankaï',price:500},
-  {name:'Jus Bissap Susanoo',price:500},{name:'Jus Tamarin Sharingan',price:500},
-  {name:'Jus Zaban Hakai',price:500},
-  {name:'Might Guy Mango Smoothie',price:2500},{name:'Spirit Bomb Tropical Mix',price:3000},
-  {name:'Banana Milk Smoothie de Yusuke',price:2500},{name:'Fraise Dream Sailor Moon',price:2000},
-  {name:'Gaufre Classique Konoha',price:1500},{name:'Gaufre Chocolat Akatsuki',price:2000},
-  {name:'Gaufre Banane Choco Gear 2',price:2500},{name:'Gaufre Mangue Vongola',price:2000},
-  {name:'Gaufre Oreo no Mi',price:3000},
-  {name:'Pancake Nature Happy',price:1000},{name:'Pancake Chocolat Mafia',price:1500},
-  {name:'Pancake Banane Miel de Chopper',price:1500},{name:'Pancake Peanut Butter Titans',price:1500},
-  {name:'Crêpe Nutella Shinigami',price:1500},{name:'Crêpe Banane Chocolat Fullmetal',price:2500},
-  {name:'Crêpe Caramel Beurre Alabasta',price:2000},{name:'Crêpe Mangue Mélodieuse',price:2000},
-  {name:'Crêpe Fraise Love ❤️',price:2000},{name:'Crêpe Oreo Dream Eater',price:2500},
-  {name:'Crêpe Poulet Fromage Hunter',price:3000},{name:'Crêpe Œuf Fromage Dragon Slayer',price:3500},
-  {name:"Crêpe Thon Fromage Levi's Choice",price:4000},
-  {name:'Ramen Squid Game',price:1500},{name:'Ramen Solo Flavoring',price:2000},
-  {name:'Ramen Tower of Ramyun',price:2500},{name:'Ramen Black Mamba',price:2500},
-  {name:'Ramen Dynamite 🔥',price:3000},
-  {name:"Cappuccino de l'Aube",price:1500},{name:'Café du Hokage',price:1000},
-  {name:'Chocolat Chaud Hotaru',price:1000},{name:'Limonade Maison Bubble Breath',price:1500},
-  {name:'Energy Drink Turbo Granny',price:1500},{name:'Salade de Fruits de la Paix',price:2000},
-  {name:'Croissant de Kiki',price:600},{name:'Œuf au Plat Dragon de Komodo',price:1000},
+  {name:'Mugiwara Classic',price:2000,cat:'the'},{name:'Souffle du Soleil',price:1500,cat:'the'},
+  {name:'Domaine Infini',price:1500,cat:'the'},{name:'Katon Style 🔥',price:1500,cat:'the'},
+  {name:'Titan Royale',price:3000,cat:'the'},{name:'Super Saiyen Spicy',price:3000,cat:'the'},
+  {name:'Sunny-Go Tropical',price:2000,cat:'fruit'},{name:'Zangetsu Mango',price:2000,cat:'fruit'},
+  {name:'Raikiri Lemon',price:1500,cat:'fruit'},{name:'Perfect Ananas',price:1500,cat:'fruit'},
+  {name:'Gomu Gomu Grenadine',price:1000,cat:'fruit'},{name:'Sage Mode Matcha Latte',price:4500,cat:'fruit'},
+  {name:'Jus Mangekyō Mangue',price:500,cat:'jus'},{name:'Jus Ananas no Mi',price:500,cat:'jus'},
+  {name:'Jus Citron Menthe Nen',price:500,cat:'jus'},{name:'Jus Gingembre Bankaï',price:500,cat:'jus'},
+  {name:'Jus Bissap Susanoo',price:500,cat:'jus'},{name:'Jus Tamarin Sharingan',price:500,cat:'jus'},
+  {name:'Jus Zaban Hakai',price:500,cat:'jus'},
+  {name:'Might Guy Mango Smoothie',price:2500,cat:'smoothie'},{name:'Spirit Bomb Tropical Mix',price:3000,cat:'smoothie'},
+  {name:'Banana Milk Smoothie de Yusuke',price:2500,cat:'smoothie'},{name:'Fraise Dream Sailor Moon',price:2000,cat:'smoothie'},
+  {name:'Gaufre Classique Konoha',price:1500,cat:'gaufre'},{name:'Gaufre Chocolat Akatsuki',price:2000,cat:'gaufre'},
+  {name:'Gaufre Banane Choco Gear 2',price:2500,cat:'gaufre'},{name:'Gaufre Mangue Vongola',price:2000,cat:'gaufre'},
+  {name:'Gaufre Oreo no Mi',price:3000,cat:'gaufre'},
+  {name:'Pancake Nature Happy',price:1000,cat:'pancake'},{name:'Pancake Chocolat Mafia',price:1500,cat:'pancake'},
+  {name:'Pancake Banane Miel de Chopper',price:1500,cat:'pancake'},{name:'Pancake Peanut Butter Titans',price:1500,cat:'pancake'},
+  {name:'Crêpe Nutella Shinigami',price:1500,cat:'crepe'},{name:'Crêpe Banane Chocolat Fullmetal',price:2500,cat:'crepe'},
+  {name:'Crêpe Caramel Beurre Alabasta',price:2000,cat:'crepe'},{name:'Crêpe Mangue Mélodieuse',price:2000,cat:'crepe'},
+  {name:'Crêpe Fraise Love ❤️',price:2000,cat:'crepe'},{name:'Crêpe Oreo Dream Eater',price:2500,cat:'crepe'},
+  {name:'Crêpe Poulet Fromage Hunter',price:3000,cat:'crepe'},{name:'Crêpe Œuf Fromage Dragon Slayer',price:3500,cat:'crepe'},
+  {name:"Crêpe Thon Fromage Levi's Choice",price:4000,cat:'crepe'},
+  {name:'Ramen Squid Game',price:1500,cat:'ramen'},{name:'Ramen Solo Flavoring',price:2000,cat:'ramen'},
+  {name:'Ramen Tower of Ramyun',price:2500,cat:'ramen'},{name:'Ramen Black Mamba',price:2500,cat:'ramen'},
+  {name:'Ramen Dynamite 🔥',price:3000,cat:'ramen'},
+  {name:"Cappuccino de l'Aube",price:1500,cat:'autre'},{name:'Café du Hokage',price:1000,cat:'autre'},
+  {name:'Chocolat Chaud Hotaru',price:1000,cat:'autre'},{name:'Limonade Maison Bubble Breath',price:1500,cat:'autre'},
+  {name:'Energy Drink Turbo Granny',price:1500,cat:'autre'},{name:'Salade de Fruits de la Paix',price:2000,cat:'autre'},
+  {name:'Croissant de Kiki',price:600,cat:'autre'},{name:'Œuf au Plat Dragon de Komodo',price:1000,cat:'autre'},
 ];
 
-let stockData  = {};
-let photosData = {};
+let stockData   = {};
+let photosData  = {};
+let menuPrices  = {}; // {itemName: newPrice}
+let menuHidden  = []; // [itemName]
+let customItems = []; // [{id, name, price, cat, tag, desc, premium}]
 
 // ── EXPOSE TO GLOBAL SCOPE ────────────────────────────────────
 // Called by the regular-script switchTab and checkPin
 function _exposeGlobals() {
-  window._initAdmin     = initAdmin;
-  window._loadUsers     = loadUsers;
-  window._renderStock   = renderStock;
-  window._renderPhotos  = renderPhotos;
-  window._loadNews      = loadNews;
-  window._loadGallery   = loadGalleryAdmin;
-  window._renderHoraires= renderHoraires;
-  window._loadInfos     = loadInfos;
-  window._loadSeason    = loadSeason;
+  window._initAdmin      = initAdmin;
+  window._loadUsers      = loadUsers;
+  window._renderStock    = renderStock;
+  window._renderPhotos   = renderPhotos;
+  window._loadNews       = loadNews;
+  window._loadGallery    = loadGalleryAdmin;
+  window._renderHoraires = renderHoraires;
+  window._loadInfos      = loadInfos;
+  window._loadSeason     = loadSeason;
+  window._loadMenuAdmin  = loadMenuAdmin;
 }
 // Expose immediately when module is parsed
 _exposeGlobals();
@@ -510,6 +579,8 @@ async function loadConfigData() {
       const d = snap.data();
       stockData  = d.stock  || {};
       photosData = d.photos || {};
+      menuPrices = d.menuPrices || {};
+      menuHidden = d.menuHidden || [];
       if (d.horairesText) document.getElementById('horairesText').value = d.horairesText;
       if (d.wa1)       document.getElementById('wa1').value       = d.wa1;
       if (d.wa2)       document.getElementById('wa2').value       = d.wa2;
@@ -741,7 +812,7 @@ window.deleteGalleryPhoto = deleteGalleryPhoto;
 
 // ── HORAIRES ──────────────────────────────────────────────────
 const DEFAULT_SCHEDULE = {
-  0:{open:10,close:21},1:{open:8,close:22},2:{open:8,close:22},
+  0:{open:10,close:21},1:{closed:true,open:8,close:22},2:{open:8,close:22},
   3:{open:8,close:22},4:{open:8,close:22},5:{open:8,close:22},6:{open:9,close:23}
 };
 let scheduleData = {...DEFAULT_SCHEDULE};
@@ -751,15 +822,34 @@ function renderHoraires() {
   const grid = document.getElementById('horairesGrid');
   grid.innerHTML = DAYS_FR.map((day, i) => {
     const sch = scheduleData[i] || DEFAULT_SCHEDULE[i];
-    return `<div class="horaire-row">
+    const isClosed = sch.closed === true;
+    return `<div class="horaire-row" id="hrow-${i}">
       <div class="horaire-day">${day}</div>
+      <label class="toggle" title="Fermé ce jour">
+        <input type="checkbox" ${isClosed?'checked':''} onchange="toggleClosedDay(${i},this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+      <span style="font-size:0.65rem;color:${isClosed?'var(--red)':'var(--green)'};" id="hclosed-${i}">${isClosed?'Fermé':'Ouvert'}</span>
       <input class="horaire-input" type="number" min="0" max="23" value="${sch.open}"
-        onchange="scheduleData[${i}]={...scheduleData[${i}],open:parseInt(this.value)}" placeholder="Ouv.">
+        ${isClosed?'disabled':''} style="${isClosed?'opacity:0.3;':''}"
+        onchange="scheduleData[${i}]={...scheduleData[${i}],open:parseInt(this.value)}" placeholder="Ouv." id="hopen-${i}">
       <input class="horaire-input" type="number" min="0" max="23" value="${sch.close}"
-        onchange="scheduleData[${i}]={...scheduleData[${i}],close:parseInt(this.value)}" placeholder="Ferm.">
+        ${isClosed?'disabled':''} style="${isClosed?'opacity:0.3;':''}"
+        onchange="scheduleData[${i}]={...scheduleData[${i}],close:parseInt(this.value)}" placeholder="Ferm." id="hclose-${i}">
     </div>`;
   }).join('');
 }
+
+function toggleClosedDay(i, isClosed) {
+  scheduleData[i] = {...(scheduleData[i]||DEFAULT_SCHEDULE[i]), closed: isClosed};
+  const label = document.getElementById('hclosed-'+i);
+  const openI = document.getElementById('hopen-'+i);
+  const closeI= document.getElementById('hclose-'+i);
+  if (label) { label.textContent = isClosed?'Fermé':'Ouvert'; label.style.color = isClosed?'var(--red)':'var(--green)'; }
+  if (openI)  { openI.disabled  = isClosed; openI.style.opacity  = isClosed?'0.3':'1'; }
+  if (closeI) { closeI.disabled = isClosed; closeI.style.opacity = isClosed?'0.3':'1'; }
+}
+window.toggleClosedDay = toggleClosedDay;
 
 async function saveHoraires() {
   const text = document.getElementById('horairesText').value.trim();
@@ -875,6 +965,123 @@ async function doReset() {
   } catch(e) { toast('❌ Erreur : ' + e.message); }
 }
 window.doReset = doReset;
+
+// ── MENU ADMIN ────────────────────────────────────────────────
+const CAT_LABELS = {
+  the:'🍵 Thés',fruit:'🫧 Fruit Tea',jus:'🥤 Jus',smoothie:'🥤 Smoothies',
+  gaufre:'🧇 Gaufres',pancake:'🥞 Pancakes',crepe:'🫓 Crêpes',ramen:'🍜 Ramen',autre:'✨ Autres'
+};
+
+async function loadMenuAdmin() {
+  try {
+    // Load overrides from Firestore
+    const snap = await getDoc(doc(db,'config','settings'));
+    if (snap.exists()) {
+      menuPrices = snap.data().menuPrices || {};
+      menuHidden = snap.data().menuHidden || [];
+    }
+    // Load custom items
+    const cSnap = await getDocs(collection(db,'customMenu'));
+    customItems = [];
+    cSnap.forEach(d => customItems.push({...d.data(), id: d.id}));
+    renderMenuAdmin('all');
+  } catch(e) { console.warn('MenuAdmin:', e); }
+}
+
+let currentMenuCat = 'all';
+function renderMenuAdmin(cat) {
+  currentMenuCat = cat;
+  const el = document.getElementById('menuAdminList');
+  // Combine base items + custom items
+  const baseItems = MENU_ITEMS.filter(i => cat === 'all' || i.cat === cat).map(i => ({...i, custom:false}));
+  const custFiltered = customItems.filter(i => cat === 'all' || i.cat === cat).map(i => ({...i, custom:true}));
+  const allItems = [...baseItems, ...custFiltered];
+  if (allItems.length === 0) { el.innerHTML='<div class="empty-state">Aucun plat dans cette catégorie.</div>'; return; }
+  el.innerHTML = allItems.map(item => {
+    const price  = menuPrices[item.name] !== undefined ? menuPrices[item.name] : item.price;
+    const hidden = menuHidden.includes(item.name);
+    const safeName = item.name.replace(/'/g,"\\'");
+    return `<div class="menu-item-row ${hidden?'hidden-item':''}" id="row-${encodeURIComponent(item.name)}">
+      <div>
+        <div class="menu-item-name">${item.name}${item.custom?'<span class="custom-badge">Nouveau</span>':''}</div>
+        <div class="menu-item-cat">${CAT_LABELS[item.cat]||item.cat}</div>
+      </div>
+      <input class="menu-price-input" type="number" value="${price}" min="0"
+        onblur="saveMenuPrice('${safeName}', this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()">
+      <button class="btn-icon" title="${hidden?'Afficher':'Masquer'}" onclick="toggleMenuHidden('${safeName}', ${!hidden})">${hidden?'👁️':'🙈'}</button>
+      ${item.custom ? `<button class="btn-icon" title="Supprimer" onclick="deleteCustomItem('${item.id}')">🗑️</button>` : '<div style="width:30px"></div>'}
+    </div>`;
+  }).join('');
+}
+window.renderMenuAdmin = renderMenuAdmin;
+
+function filterMenuAdmin(cat, btn) {
+  document.querySelectorAll('#menuCatFilter .btn-sm').forEach(b => b.classList.remove('active-cat'));
+  btn.classList.add('active-cat');
+  renderMenuAdmin(cat);
+}
+window.filterMenuAdmin = filterMenuAdmin;
+
+async function saveMenuPrice(name, value) {
+  const price = parseInt(value);
+  if (isNaN(price) || price < 0) return;
+  menuPrices[name] = price;
+  try {
+    await setDoc(doc(db,'config','settings'), {menuPrices}, {merge:true});
+    toast('✅ Prix mis à jour !'); showSaveStatus();
+  } catch(e) { toast('❌ '+e.message); }
+}
+window.saveMenuPrice = saveMenuPrice;
+
+async function toggleMenuHidden(name, hide) {
+  if (hide) { if (!menuHidden.includes(name)) menuHidden.push(name); }
+  else menuHidden = menuHidden.filter(n => n !== name);
+  try {
+    await setDoc(doc(db,'config','settings'), {menuHidden}, {merge:true});
+    toast(hide ? '🙈 Plat masqué sur le menu' : '👁️ Plat de nouveau visible');
+    renderMenuAdmin(currentMenuCat);
+  } catch(e) { toast('❌ '+e.message); }
+}
+window.toggleMenuHidden = toggleMenuHidden;
+
+async function addMenuItem() {
+  const name  = document.getElementById('newItemName').value.trim();
+  const price = parseInt(document.getElementById('newItemPrice').value);
+  const cat   = document.getElementById('newItemCat').value;
+  const tag   = document.getElementById('newItemTag').value.trim();
+  const desc  = document.getElementById('newItemDesc').value.trim();
+  const premium = document.getElementById('newItemPremium').checked;
+  if (!name)  { toast('⚠️ Le nom est obligatoire'); return; }
+  if (!price || price <= 0) { toast('⚠️ Indique un prix valide'); return; }
+  if (!cat)   { toast('⚠️ Choisis une catégorie'); return; }
+  // Check duplicate
+  if (MENU_ITEMS.some(i => i.name === name) || customItems.some(i => i.name === name)) {
+    toast('⚠️ Un plat avec ce nom existe déjà'); return;
+  }
+  try {
+    const ref = await addDoc(collection(db,'customMenu'), {name, price, cat, tag, desc, premium, createdAt: serverTimestamp()});
+    customItems.push({id:ref.id, name, price, cat, tag, desc, premium});
+    toast('✅ Plat ajouté au menu !'); showSaveStatus();
+    // Reset form
+    ['newItemName','newItemPrice','newItemTag','newItemDesc'].forEach(id => { document.getElementById(id).value=''; });
+    document.getElementById('newItemCat').value = '';
+    document.getElementById('newItemPremium').checked = false;
+    renderMenuAdmin(currentMenuCat);
+  } catch(e) { toast('❌ '+e.message); }
+}
+window.addMenuItem = addMenuItem;
+
+async function deleteCustomItem(id) {
+  if (!confirm('Supprimer ce plat du menu ?')) return;
+  try {
+    await deleteDoc(doc(db,'customMenu',id));
+    customItems = customItems.filter(i => i.id !== id);
+    toast('🗑️ Plat supprimé');
+    renderMenuAdmin(currentMenuCat);
+  } catch(e) { toast('❌ '+e.message); }
+}
+window.deleteCustomItem = deleteCustomItem;
 
 </script>
 </body>
